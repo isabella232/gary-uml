@@ -1,0 +1,119 @@
+@startuml
+
+header
+Start Launcher Job
+endheader
+
+box "Gwt"
+    participant Commands
+    participant LauncherJobManagerPro
+    participant JobLauncherDialogPro
+    participant ClientEvents
+end box
+
+box "launcher.js"
+    participant LauncherUIPro
+end box
+
+box "RServer"
+    participant ServerJobLauncherRpc
+endbox
+
+box "Job Launcher"
+    participant REST
+endbox
+
+box "Job"
+
+endbox
+
+box "RSession"
+    participant SessionJobs
+    participant ScriptJob << AsyncRProcess >>
+    participant RProcess
+    participant JobsApi
+    participant Job
+endbox
+
+Commands -> LauncherJobManagerPro : onLauncherJobRunScript
+Commands -> LauncherJobManagerPro : (or) onLauncherJobRunSelection
+LauncherJobManagerPro -> JobLauncherDialogPro : shows
+activate JobLauncherDialogPro
+JobLauncherDialogPro -> LauncherUIPro : load and embed
+activate LauncherUIPro
+LauncherUIPro -> REST : get_info
+REST -> LauncherUIPro : cluster info
+LauncherUIPro -> JobLauncherDialogPro : launcher settings
+deactivate LauncherUIPro
+JobLauncherDialogPro -> LauncherJobManagerPro : LauncherJobPro
+deactivate JobLauncherDialogPro
+LauncherJobManagerPro -> Commands : onActivateJobs (show pane)
+
+LauncherJobManagerPro -> ServerJobLauncherRpc : /job_launcher_rpc/submit_job (LauncherJobPro)
+ServerJobLauncherRpc -> REST : submit_job
+SessionJobs -> ScriptJob : startScriptJob
+activate ScriptJob
+
+ScriptJob -> JobsApi : addJob
+JobsApi -> Job : create
+activate Job
+
+ScriptJob -> RProcess : start process
+activate RProcess
+
+ScriptJob -> ScriptJob : add to ScriptJob list
+group Start Running
+RProcess -> ScriptJob : stdout count-ESC
+ScriptJob -> Job : setProgressMax
+ScriptJob -> JobsApi : setJobState (Running)
+JobsApi -> Job : setState (Running)
+Job -> Job : save started
+JobsApi -> ClientEvents : JobUpdated
+end
+
+opt Report zero or more named sections
+RProcess -> ScriptJob : stdout section-ESC
+ScriptJob -> JobsApi : setJobStatus <text>
+JobsApi -> Job : setStatus
+JobsApi -> ClientEvents : JobUpdated
+end
+
+loop ProgressMax times
+RProcess -> ScriptJob : stdout statementCount-ESC
+ScriptJob -> JobsApi : setJobProgress
+JobsApi -> Job : setProgress
+JobsApi -> ClientEvents : JobUpdated
+end
+
+loop stdout
+RProcess -> ScriptJob : onStdout
+ScriptJob -> Job : addOutput
+Job -> Job : append to log
+Job -> ClientEvents : JobOutput (if listening)
+end
+
+loop stderr
+RProcess -> ScriptJob : onStderr
+ScriptJob -> Job : addOutput
+Job -> Job : append to log
+Job -> ClientEvents : JobOutput (if listening)
+end
+
+group Job Finished
+RProcess -> ScriptJob : stdout completed-ESC
+ScriptJob -> JobsApi : setJobStatus <blank>
+JobsApi -> Job : setStatus
+JobsApi -> ClientEvents : JobUpdated
+end
+
+RProcess -> ScriptJob : onCompleted exitStatus
+destroy RProcess
+ScriptJob -> JobsApi : setJobState (success/failure)
+JobsApi -> Job : setState
+Job -> Job : save completed_
+JobsApi -> ClientEvents :  JobUpdated
+
+ScriptJob -> ScriptJob : remove from ScriptJob list
+destroy ScriptJob
+
+@enduml

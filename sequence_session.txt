@@ -1,0 +1,39 @@
+
+@startuml
+header
+Server-Driven Jobs Interaction
+endheader
+
+box "Session"
+participant RSession
+participant ScriptJob
+participant JobLauncher
+participant JobsApi
+participant SessionJobs
+participant Job
+participant Server
+endbox
+box "Gwt"
+    participant Dispatch
+    participant JobsTab<< JobsPresenter >>
+    participant JobsPane<< JobsPresenter.Display >>
+    participant JobManager
+end box
+
+ScriptJob -> JobsApi
+JobsApi -> Dispatch : job_updated\n\t(ADD/REMOVE/UPDATED)
+Dispatch -> JobsTab : onJobsUpdated
+JobsTab -> JobsPane : updateJob
+Dispatch -> JobManager : onJobsUpdated
+RSession -> SessionJobs : onResume
+SessionJobs -> Dispatch : job_refresh
+Dispatch -> JobManager : onJobRefresh
+JobManager -> JobsTab : jobInitEvent
+JobsTab -> JobsPane: setInitialJobs
+ScriptJob -> Job : addOutput
+SessionJobs -> Job : addOutput
+Job -> Dispatch : job_output
+Dispatch -> JobsTab : onJobOutput
+JobsTab -> JobsPane : addJobOutput
+
+@enduml

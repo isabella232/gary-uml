@@ -1,0 +1,187 @@
+@startuml
+header
+Client Classes
+endheader
+
+class Job<< Javascript >> {
+    +id : string
+    +name: string
+    +status: string
+    +state: int
+    +type: int
+    +progress: int
+    +max: int
+    +recorded: int
+    +started: int
+    +completed: int
+    +elapsed: int
+    +received: int
+    +actions : JsArrayString
+    +show: boolean
+    +tags: [string]
+}
+
+class JobManager<< Singleton >> {
+    -state : JobState
+    ~onSessionInit()
+    ~onJobRefresh()
+    ~onJobUpdated()
+    ~onJobRunScript()
+    ~onJobExecuteAction()
+    ~onStartJob()
+    ~onClearJobs()
+}
+
+class LocalJobProgress {
+    +name : string
+    +units : int
+    +max : int
+    +elapsed : int
+    +received : int
+}
+
+DelayLoadWorkbenchTab<< JobsPresenter >>
+class JobsTab
+DelayLoadWorkbenchTab <|-- JobsTab
+DelayLoadWorkbenchTab --> JobsPresenter
+class JobProgressPresenter {
+   ~onJobElapsedTick()
+}
+
+class JobProgress<< Composite >> {
+    +showProgress(LocalJobProgress)
+    +updateElapsedTime()
+    +setComplete()
+}
+
+JobProgress --> "1" LocalJobProgress : contains
+
+class JobsPresenter {
+   ~onJobUpdated()
+   ~onJobInit()
+   ~onJobOutput()
+   ~onJobSelection()
+   ~onJobElapsedTick()
+}
+
+interface JobsPresenter.Display {
+    +updateJob()
+    +setInitialJobs()
+    +showJobOutput()
+    +addJobOutput()
+    +hideJobOutput()
+    +syncElapsedTime()
+}
+
+JobsPresenter --> JobsPresenter.Display
+
+class JobOutputPanel<< Composite >> {
+}
+
+class ConsolePane<< WorkbenchPane >> {
+}
+
+ConsolePane --> "1" JobProgressPresenter : contains
+
+class JobsPane<< WorkbenchPane >> {
+
+}
+
+JobsPane --> "1" JobOutputPanel : contains
+JobsPane --> "1" JobsList : contains
+JobsPane --> "1" JobProgress : contains
+
+JobsPresenter.Display <|-- JobsPane
+
+interface JobProgressPresenter.Display {
+    + updateElapsed()
+    + showProgress()
+    + setComplete()
+}
+
+JobProgressPresenter.Display <|-- JobProgress
+
+JobProgressPresenter --> JobProgressPresenter.Display
+
+class JobState<< JsObject >> {
+    +getJob()
+    +updateJob()
+    +addJob()
+    +removeJob()
+    +recordReceived()
+}
+
+JobManager o-- JobState
+JobState "1" *-- "many" Job : contains
+
+class JobsList<< Composite >> {
+    -jobs : map<String, JobItem>
+    +addJob()
+    +removeJob()
+    +updateJob()
+}
+
+class JobItem<< Composite >> {
+    +update()
+    +getJob()
+    +syncTime()
+}
+
+JobItem --> "1" Job : displays
+JobsList "1" --> "many" JobItem : displays
+
+class JobOutput<< JavaScriptObject >> {
+    +type
+    +output
+}
+
+class JobsRPC {
+    +set_job_listening()
+    +execute_job_action()
+    +run_script_job()
+    +clear_jobs()
+    +get_jobs()
+    +job_output()
+    +launcher_jobs_enabled()
+}
+
+JobsPresenter ..> JobsRPC : set_job_listening
+JobManager ..> JobsRPC : execute_job_action
+JobManager ..> JobsRPC : start_job
+JobManager ..> JobsRPC : clear_jobs
+
+class ClientEvents {
+    +job_updated()
+    +job_refresh()
+    +job_output()
+}
+
+ClientEvents ..> JobManager : onJobUpdated
+ClientEvents ..> JobsPresenter : onJobUpdated
+ClientEvents ..> JobManager : onJobRefresh
+ClientEvents ..> JobsPresenter : onJobOutput
+
+class JobLauncherDialog<< ModalDialog >> {
+}
+
+class JobLauncherControls<< Composite >>
+
+class JobLaunchSpec<< JavaScriptObject >>{
+    +path : string
+    +encoding : string
+    +workingDir : string
+    +importEnv : boolean
+    +exportEnv : boolean
+}
+
+JobLauncherDialog --> "1" JobLauncherControls : displays
+JobLauncherDialog --> JobLaunchSpec : creates
+JobManager --> JobLauncherDialog
+
+class LauncherJobManager #LightGreen {
+}
+
+JobManager o-- LauncherJobManager
+LauncherJobManager ..> JobsRPC : launcher_jobs_enabled
+@enduml
+

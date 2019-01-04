@@ -1,0 +1,92 @@
+@startuml
+
+header
+Start Session Job
+endheader
+
+box "Gwt"
+    participant JobManager
+    participant JobLauncherDialog
+    participant ClientEvents
+end box
+
+box "Session"
+    participant SessionJobs
+    participant ScriptJob << AsyncRProcess >>
+    participant RProcess
+    participant JobsApi
+    participant Job
+endbox
+
+JobManager -> JobLauncherDialog : shows
+activate JobLauncherDialog
+JobLauncherDialog -> JobManager : JobLaunchSpec
+deactivate JobLauncherDialog
+
+JobManager -> SessionJobs : run_script_job
+SessionJobs -> ScriptJob : startScriptJob
+activate ScriptJob
+
+ScriptJob -> JobsApi : addJob
+JobsApi -> Job : create
+activate Job
+
+ScriptJob -> RProcess : start process
+activate RProcess
+
+ScriptJob -> ScriptJob : add to ScriptJob list
+group Start Running
+RProcess -> ScriptJob : stdout count-ESC
+ScriptJob -> Job : setProgressMax
+ScriptJob -> JobsApi : setJobState (Running)
+JobsApi -> Job : setState (Running)
+Job -> Job : save started_
+JobsApi -> ClientEvents : JobUpdated
+end
+
+opt Report zero or more named sections
+RProcess -> ScriptJob : stdout section-ESC
+ScriptJob -> JobsApi : setJobStatus <text>
+JobsApi -> Job : setStatus
+JobsApi -> ClientEvents : JobUpdated
+end
+
+loop ProgressMax times
+RProcess -> ScriptJob : stdout statementCount-ESC
+ScriptJob -> JobsApi : setJobProgress
+JobsApi -> Job : setProgress
+JobsApi -> ClientEvents : JobUpdated
+end
+
+loop stdout
+RProcess -> ScriptJob : onStdout
+ScriptJob -> Job : addOutput
+Job -> Job : append to log
+Job -> ClientEvents : JobOutput (if listening)
+end
+
+loop stderr
+RProcess -> ScriptJob : onStderr
+ScriptJob -> Job : addOutput
+Job -> Job : append to log
+Job -> ClientEvents : JobOutput (if listening)
+end
+
+group Job Finished
+RProcess -> ScriptJob : stdout completed-ESC
+ScriptJob -> JobsApi : setJobStatus <blank>
+JobsApi -> Job : setStatus
+JobsApi -> ClientEvents : JobUpdated
+end
+
+RProcess -> ScriptJob : onCompleted exitStatus
+destroy RProcess
+ScriptJob -> JobsApi : setJobState (success/failure)
+JobsApi -> Job : setState
+Job -> Job : save completed_
+JobsApi -> ClientEvents :  JobUpdated
+
+ScriptJob -> ScriptJob : remove from ScriptJob list
+destroy ScriptJob
+
+@enduml

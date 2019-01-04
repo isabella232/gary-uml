@@ -1,0 +1,40 @@
+@startuml
+
+header
+Client Startup
+endheader
+
+box "Gwt"
+    participant Application
+    participant JobManager
+    participant JobsTab<< JobsPresenter >>
+    participant JobProgressPresenter
+    participant JobProgress<< JobProgressPresenter.Display >>
+    participant JobsPane<< JobsPresenter.Display >>
+    participant JobsList
+    participant Console
+end box
+
+box "Session"
+    participant RPC
+    participant SessionJobs
+    participant JobsApi
+endbox
+
+Application -> RPC : client_init
+RPC -> SessionJobs : jobState
+SessionJobs -> JobsApi : jobsAsJson
+Application <- JobsApi : SessionInfo.job_state
+Application -> JobManager : onSessionInit
+JobManager -> JobsTab : jobInitEvent
+JobsTab -> JobsPane : setInitialJobs
+JobsPane -> JobsList : loadJobList
+JobManager -> Console : onJobProgress
+JobManager -> JobManager : setJobState\nStarts a timer to emit\nJobsElapstedTick events\nwhen there are jobs
+JobManager -> JobsTab : onJobsElapsedTick
+JobsTab -> JobsPane : syncElapsedTime
+JobsPane -> JobsList : syncElapsedTime
+JobManager -> JobProgressPresenter : onJobsElapsedTick
+JobProgressPresenter -> JobProgress : updateElapsed
+
+@enduml
