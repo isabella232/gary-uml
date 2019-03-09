@@ -71,6 +71,7 @@ class JobsPresenter
 class JobsDisplayImpl
 class LauncherJobsPaneWidgets
 class LauncherJobManager
+class JobItem
 
 JobsPresenterEventHandlers <|.. JobsPresenterEventHandlersImpl
 JobsPresenterEventHandlers <|.. JobsTab::Shim
@@ -97,6 +98,8 @@ JobsPane ..> JobsPaneOperations : <<use>>
 JobsPaneOperations <|.. JobsPaneWidgets
 JobsPaneOperations <|.. LauncherJobsPaneWidgets
 JobsPaneWidgets ..> JobsListView : <<use>>
+
+JobsListViewImpl "1" o-- "*" JobItem
 
 interface LauncherJobsPresenter::Display #LightGreen
 
