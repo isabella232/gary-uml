@@ -1,0 +1,149 @@
+@startuml
+header
+Client Classes
+endheader
+
+interface JobsPresenterEventHandlers {
+   + onJobUpdated(JobUpdatedEvent)
+   + onJobInit(JobInitEvent)
+   + onJobOutput(JobOutputEvent)
+   + onJobSelection(JobSelectionEvent)
+   + onJobElapsedTick(JobElapsedTickEvent)
+}
+
+interface JobsDisplay {
+   + updateJob(updateType, Job)
+   + setInitialJobs(List<Job> jobs)
+   + showJobOutput(jobId, JsArray<JobOutput>)
+   + addJobOutput(jobId, outputType, output)
+   + hideJobOutput(jobId)
+   + syncElapsedTime(timestamp)
+   + setShowTabPref(show)
+}
+
+interface JobsListView {
+   + addJob(Job, Consumer<JobItem>)
+   + insertJob(Job, Consumer<JobItem>)
+   + removeJob(Job, Command)
+   + updateJob(Job)
+   + clear()
+   + syncElapsedTime(timestamp)
+   + getJob(String id): Job
+   + jobCount(): int
+   + getJobs(): List<Job>
+   + setInitialJobs(List<Job>)
+}
+
+interface JobsPaneOperations {
+   + createMainWidget()
+   + installJobToolbar()
+   + installMainToolbar()
+   + removeProgressWidget()
+   + getCurrent()
+   + setCurrent()
+   + isCurrent()
+   + updateProgress(int timestamp)
+   + showProgress(Job job)
+   + addJob(Job job)
+   + setInitialJobs(List<Job> jobs)
+   + insertJob(Job job)
+   + removeJob(Job job)
+   + updateJob(Job job)
+   + clear()
+   + syncElapsedTime(int timestamp)
+   + getToolbar()
+   + getOutputPanel()
+   + getPanel()
+}
+
+interface JobsListView
+interface JobsPresenter::Display
+
+class JobsTab::Shim
+class JobsTab
+class JobsPane
+class JobsList
+class JobsPaneWidgets
+
+class JobsListViewImpl
+class JobsPresenterEventHandlersImpl
+class JobsPresenter
+class JobsDisplayImpl
+class LauncherJobsPaneWidgets
+class LauncherJobManager
+
+JobsPresenterEventHandlers <|.. JobsPresenterEventHandlersImpl
+JobsPresenterEventHandlers <|.. JobsTab::Shim
+JobsPresenterEventHandlers <|.. JobsPresenter
+JobsTab o-- JobsTab::Shim
+JobsTab::Shim o-- JobsPresenter
+JobsPresenter o-- JobsPresenter::Display
+JobsPresenter *-- JobsPresenterEventHandlersImpl
+
+JobsDisplay <|.. JobsPresenter::Display
+JobsDisplay <|.. JobsDisplayImpl
+
+JobsPresenter::Display <|.. JobsPane
+
+JobsListView <|.. JobsListViewImpl
+JobsListView <|.. JobsList
+JobsList *-- JobsListViewImpl
+
+JobsPane *-- JobsDisplayImpl
+JobsPaneWidgets <.. JobsList : <<inject>>
+JobsPane <.. JobsPaneWidgets : <<inject>>
+JobsPane ..> JobsPaneOperations : <<use>>
+
+JobsPaneOperations <|.. JobsPaneWidgets
+JobsPaneOperations <|.. LauncherJobsPaneWidgets
+JobsPaneWidgets ..> JobsListView : <<use>>
+
+interface LauncherJobsPresenter::Display #LightGreen
+
+class LauncherJobsTab::Shim #LightGreen
+class LauncherJobsTab #LightGreen
+class LauncherJobsPresenter #LightGreen
+class LauncherJobsPane #LightGreen
+class LauncherJobsList #LightBlue
+class LauncherJobsPaneWidgetsPro #LightBlue
+class LauncherJobSortMenu #LightBlue
+
+class LauncherJobManagerPro #LightBlue
+
+LauncherJobManager <|.. LauncherJobManagerPro
+
+JobsPresenter ..> JobsPane : <<create>>
+LauncherJobsPresenter ..> LauncherJobsPane : <<create>>
+
+JobsPaneOperations <|.. LauncherJobsPaneWidgetsPro
+JobsPresenterEventHandlers <|.. LauncherJobsTab::Shim
+JobsPresenterEventHandlers <|.. LauncherJobsPresenter
+LauncherJobsTab o-- LauncherJobsTab::Shim
+LauncherJobsTab::Shim o-- LauncherJobsPresenter
+LauncherJobsPresenter o-- LauncherJobsPresenter::Display
+LauncherJobsPresenter *-- JobsPresenterEventHandlersImpl
+JobsPresenterEventHandlersImpl ..> JobsDisplay : <<use>>
+
+JobsDisplay <|.. LauncherJobsPresenter::Display
+LauncherJobsPresenter::Display <|.. LauncherJobsPane
+
+JobsListView <|.. LauncherJobsList
+LauncherJobsList *-- JobsListViewImpl
+
+LauncherJobsPane *-- JobsDisplayImpl
+
+JobsDisplayImpl ..> JobsListView : <<use>>
+
+LauncherJobsPane <.. LauncherJobsPaneWidgetsPro : <<inject>>
+LauncherJobsPane ..> JobsPaneOperations : <<use>>
+LauncherJobsPaneWidgetsPro <.. LauncherJobsList : <<inject>>
+LauncherJobsPaneWidgetsPro ..> JobsListView : <<use>>
+LauncherJobsPaneWidgets <|.. LauncherJobsPaneWidgetsPro
+
+LauncherJobsPresenter ..> LauncherJobManager : <<use>>
+LauncherJobsList ..> LauncherJobManager : <<use>>
+
+LauncherJobsPaneWidgetsPro <.. LauncherJobSortMenu : <<inject>>
+
+@enduml
+

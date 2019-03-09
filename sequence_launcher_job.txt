@@ -41,7 +41,8 @@ LauncherJobManagerPro -> JobLauncherDialogPro : shows
 activate JobLauncherDialogPro
 JobLauncherDialogPro -> LauncherUIPro : load and embed
 activate LauncherUIPro
-LauncherUIPro -> REST : get_info
+LauncherUIPro -> ServerJobLauncherRpc : job_launcher_rpc/get_info
+ServerJobLauncherRpc -> REST : get_info
 REST -> LauncherUIPro : cluster info
 LauncherUIPro -> JobLauncherDialogPro : launcher settings
 deactivate LauncherUIPro
