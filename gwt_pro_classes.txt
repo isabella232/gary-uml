@@ -22,9 +22,9 @@ interface JobsDisplay {
 }
 
 interface JobsListView {
-   + addJob(Job, Consumer<JobItem>)
-   + insertJob(Job, Consumer<JobItem>)
-   + removeJob(Job, Command)
+   + addJob(Job)
+   + insertJob(Job)
+   + removeJob(Job)
    + updateJob(Job)
    + clear()
    + syncElapsedTime(timestamp)
@@ -56,13 +56,20 @@ interface JobsPaneOperations {
    + getPanel()
 }
 
+interface JobItemView {
+   update(Job)
+   getJob() : Job
+   syncTime(int timestamp);
+}
+
+
 interface JobsListView
 interface JobsPresenter::Display
 
 class JobsTab::Shim
 class JobsTab
-class JobsPane
-class JobsList
+class JobsPane <<WorkbenchPane>>
+class JobsList <<Composite>>
 class JobsPaneWidgets
 
 class JobsListViewImpl
@@ -71,7 +78,7 @@ class JobsPresenter
 class JobsDisplayImpl
 class LauncherJobsPaneWidgets
 class LauncherJobManager
-class JobItem
+class JobItem <<Composite>>
 
 JobsPresenterEventHandlers <|.. JobsPresenterEventHandlersImpl
 JobsPresenterEventHandlers <|.. JobsTab::Shim
@@ -83,10 +90,10 @@ JobsPresenter *-- JobsPresenterEventHandlersImpl
 
 JobsDisplay <|.. JobsPresenter::Display
 JobsDisplay <|.. JobsDisplayImpl
+JobItemView <|.. JobItem
 
 JobsPresenter::Display <|.. JobsPane
 
-JobsListView <|.. JobsListViewImpl
 JobsListView <|.. JobsList
 JobsList *-- JobsListViewImpl
 
@@ -99,17 +106,18 @@ JobsPaneOperations <|.. JobsPaneWidgets
 JobsPaneOperations <|.. LauncherJobsPaneWidgets
 JobsPaneWidgets ..> JobsListView : <<use>>
 
-JobsListViewImpl "1" o-- "*" JobItem
+JobsListViewImpl "1" o-- "*" JobItemView
 
 interface LauncherJobsPresenter::Display #LightGreen
 
 class LauncherJobsTab::Shim #LightGreen
 class LauncherJobsTab #LightGreen
 class LauncherJobsPresenter #LightGreen
-class LauncherJobsPane #LightGreen
-class LauncherJobsList #LightBlue
+class LauncherJobsPane <<WorkbenchPane>> #LightGreen
+class LauncherJobsList <<Composite>> #LightBlue
 class LauncherJobsPaneWidgetsPro #LightBlue
 class LauncherJobSortMenu #LightBlue
+class LauncherJobItem <<Composite>> #LightBlue
 
 class LauncherJobManagerPro #LightBlue
 
@@ -147,6 +155,8 @@ LauncherJobsPresenter ..> LauncherJobManager : <<use>>
 LauncherJobsList ..> LauncherJobManager : <<use>>
 
 LauncherJobsPaneWidgetsPro <.. LauncherJobSortMenu : <<inject>>
+
+JobItemView <|.. LauncherJobItem
 
 @enduml
 
