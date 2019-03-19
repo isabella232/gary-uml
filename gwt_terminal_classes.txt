@@ -1,0 +1,56 @@
+@startuml
+
+header
+Terminal Classes (GWT)
+endheader
+
+interface WorkbenchView {
+   + bringToFront()
+   + maximize()
+   + ensureHeight(height)
+   + setProgress(showProgress)
+   + onBeforeUnselected()
+   + onBeforeSelected()
+   + void onSelected()
+}
+
+class TerminalTabPresenter <<BusyPresenter>>
+
+interface DisplaySelectedCallback {
+    + displaySelected()
+}
+
+interface TerminalTabPresenter.Display {
+   + activateTerminal(DisplaySelectedCallback)
+   + createTerminal(postCreateText)
+   + terminateCurrentTerminal()
+   + repopulateTerminals(ArrayList<ConsoleProcessInfo>)
+   + activeTerminals() : boolean
+   + terminateAllTerminals()
+   + renameTerminal()
+   + clearTerminalScrollbackBuffer(caption)
+   + previousTerminal()
+   + nextTerminal()
+   + showTerminalInfo()
+   + sendToTerminal(text, setFocus)
+   + interruptTerminal()
+   + addTerminal(ConsoleProcessInfo, hasSession)
+   + removeTerminal(handle)
+   + activateNamedTerminal(caption, createdByApi)
+   + sendTerminalToEditor()
+   + ensureTerminal()
+}
+
+class TerminalTab
+class XTermNative <<JavaScriptObject>>
+class Widget
+class XTermWidget
+class TerminalSession
+
+XTermWidget <|.. TerminalSession
+Widget <|.. XTermWidget
+XTermWidget o.. XTermNative
+WorkbenchView <|.. TerminalTabPresenter.Display
+
+@enduml
+
