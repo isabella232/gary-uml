@@ -5,33 +5,32 @@ Terminal Classes (GWT)
 endheader
 
 interface WorkbenchView {
-   + bringToFront()
-   + maximize()
-   + ensureHeight(height)
-   + setProgress(showProgress)
-   + onBeforeUnselected()
-   + onBeforeSelected()
-   + void onSelected()
+   bringToFront()
+   ensureHeight(int)
+   maximize()
+   onBeforeSelected()
+   onBeforeUnselected()
+   onSelected()
+   setProgress(boolean)
 }
 
 class DelayLoadWorkbenchTab<T>
 
-class TerminalTab <TerminalTabPresenter> {
+class TerminalTab <TerminalTabPresenter> <<singleton>> {
    + closeable() : boolean
    + confirmClose(Command)
 }
 DelayLoadWorkbenchTab <|-- TerminalTab
 
 abstract class BasePresenter {
-   + getView() : WorkbenchView
    + asWidget() : Widget
-   + onBeforeUnselected()
+   + getView() : WorkbenchView
    + onBeforeSelected()
+   + onBeforeUnselected()
    + onSelected()
-   - view : WorkbenchView
 }
 
-class TerminalTabPresenter <<BasePresenter>> {
+class TerminalTabPresenter {
    + confirmClose(Command)
    + onRepopulateTerminals(ArrayList<ConsoleProcessInfo>)
    .. Event Handlers ..
@@ -56,35 +55,39 @@ class TerminalTabPresenter <<BasePresenter>> {
 BasePresenter <|-- TerminalTabPresenter
 
 interface DisplaySelectedCallback {
-    + displaySelected()
+   displaySelected()
 }
 
 interface TerminalTabPresenter.Display {
-   + activateTerminal(DisplaySelectedCallback)
-   + createTerminal(postCreateText)
-   + terminateCurrentTerminal()
-   + repopulateTerminals(ArrayList<ConsoleProcessInfo>)
-   + activeTerminals() : boolean
-   + terminateAllTerminals()
-   + renameTerminal()
-   + clearTerminalScrollbackBuffer(caption)
-   + previousTerminal()
-   + nextTerminal()
-   + showTerminalInfo()
-   + sendToTerminal(text, setFocus)
-   + interruptTerminal()
-   + addTerminal(ConsoleProcessInfo, hasSession)
-   + removeTerminal(handle)
-   + activateNamedTerminal(caption, createdByApi)
-   + sendTerminalToEditor()
-   + ensureTerminal()
+   activateNamedTerminal(caption, createdByApi)
+   activateTerminal(DisplaySelectedCallback)
+   activeTerminals() : boolean
+   addTerminal(ConsoleProcessInfo, hasSession)
+   clearTerminalScrollbackBuffer(caption)
+   createTerminal(postCreateText)
+   ensureTerminal()
+   interruptTerminal()
+   nextTerminal()
+   previousTerminal()
+   removeTerminal(handle)
+   renameTerminal()
+   repopulateTerminals(ArrayList<ConsoleProcessInfo>)
+   sendTerminalToEditor()
+   sendToTerminal(text, setFocus)
+   showTerminalInfo()
+   terminateAllTerminals()
+   terminateCurrentTerminal()
 }
 
 class XTermNative <<JavaScriptObject>>
 class Widget
 class XTermWidget
 class TerminalSession
-class TerminalHelper
+
+class TerminalHelper <<singleton>> {
+    + warnBeforeClosing(busyMode) : boolean
+    + warnBusyTerminalBeforeCommand(Command, ...)
+}
 
 class TerminalTab.Shim <<generated>> {
    ~ onRepopulateTerminals(ArrayList<ConsoleProcessInfo>)
@@ -108,12 +111,76 @@ class TerminalTab.Shim <<generated>> {
    + onShowTerminalInfo()
 }
 
+class ToolbarPane {
+   + bringToFront()
+   + ensureHeight(int)
+   + maximize()
+   + setProgress(boolean)
+}
+
+abstract class WorkbenchPane {
+   + closable() : boolean
+   + confirmClose(Command)
+   + getTitle() : String
+   + isSuppressed() : boolean
+   + onBeforeSelected()
+   + onBeforeUnselected()
+   + onSelected()
+   + prefetch(Command)
+}
+ToolbarPane <|-- WorkbenchPane
+
+class TerminalPane {
+   # createMainWidget() : Widget
+   # createMainToolbar() : Toolbar
+   .. Event Handlers ..
+   + onTerminalSessionStarted(TerminalSessionStartedEvent)
+   + onTerminalSessionStopped(TerminalSessionStoppedEvent)
+   + onServerProcessExit(ServerProcessExitEvent)
+   + onSwitchToTerminal(SwitchToTerminalEvent)
+   + onTerminalTitle(TerminalTitleEvent)
+   + onSessionSerialization(SessionSerializationEvent)
+   + onTerminalSubproc(TerminalSubprocEvent)
+}
+
+TerminalTabPresenter.Display <|.. TerminalPane
+TerminalTabPresenter ..> TerminalTabPresenter.Display : <<use>>
+TerminalTabPresenter ..> TerminalHelper : <<use>>
+
+interface WorkbenchTab {
+   closeable() : boolean
+   confirmClose(Command)
+   getTitle() : String
+   isSuppressed() : boolean
+   onBeforeSelected()
+   onBeforeUnselected()
+   onSelected()
+   prefetch(Command continuation)
+}
+
+WorkbenchView <|.. WorkbenchPane
+WorkbenchTab <|.. WorkbenchPane
+WorkbenchPane <|-- TerminalPane
+
+class DeckLayoutPanel
+class TerminalPopupMenu
+class TerminalList
+
+TerminalPane *-- "1" DeckLayoutPanel
+TerminalPane *-- "1" TerminalPopupMenu
+TerminalPane *-- "1" TerminalList
+
 XTermWidget <|-- TerminalSession
 Widget <|-- XTermWidget
 XTermWidget *-- "1" XTermNative
-WorkbenchView <|-- TerminalTabPresenter.Display
-TerminalTab *-- TerminalTab.Shim
-TerminalTab.Shim *-- TerminalTabPresenter
+WorkbenchView <|.. TerminalTabPresenter.Display
+TerminalTab *-- "1" TerminalTab.Shim
+TerminalTab.Shim *-- "1" TerminalTabPresenter
+TerminalPopupMenu ..> TerminalList : <<use>>
+DeckLayoutPanel o-- "0..*" TerminalSession
+TerminalList *-- "0..*" TerminalSession
+
+hide members
 
 @enduml
 
