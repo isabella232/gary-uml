@@ -14,7 +14,46 @@ interface WorkbenchView {
    + void onSelected()
 }
 
-class TerminalTabPresenter <<BusyPresenter>>
+class DelayLoadWorkbenchTab<T>
+
+class TerminalTab <TerminalTabPresenter> {
+   + closeable() : boolean
+   + confirmClose(Command)
+}
+DelayLoadWorkbenchTab <|-- TerminalTab
+
+abstract class BasePresenter {
+   + getView() : WorkbenchView
+   + asWidget() : Widget
+   + onBeforeUnselected()
+   + onBeforeSelected()
+   + onSelected()
+   - view : WorkbenchView
+}
+
+class TerminalTabPresenter <<BasePresenter>> {
+   + confirmClose(Command)
+   + onRepopulateTerminals(ArrayList<ConsoleProcessInfo>)
+   .. Event Handlers ..
+   + onActivateNamedTerminal(ActivateNamedTerminalEvent)
+   + onAddToTerminal(AddToTerminalEvent)
+   + onClearTerminal(ClearTerminalEvent)
+   + onCreateTerminal(CreateTerminalEvent)
+   + onRemoveTerminal(RemoveTerminalEvent)
+   + onSendToTerminal(SendToTerminalEvent)
+   .. Command Handlers ..
+   + onActivateTerminal()
+   + onClearTerminalScrollbackBuffer()
+   + onCloseTerminal()
+   + onInterruptTerminal()
+   + onNextTerminal()
+   + onPreviousTerminal()
+   + onRenameTerminal() 
+   + onSendTerminalToEditor()
+   + onShowTerminalInfo()
+}
+
+BasePresenter <|-- TerminalTabPresenter
 
 interface DisplaySelectedCallback {
     + displaySelected()
@@ -41,16 +80,40 @@ interface TerminalTabPresenter.Display {
    + ensureTerminal()
 }
 
-class TerminalTab
 class XTermNative <<JavaScriptObject>>
 class Widget
 class XTermWidget
 class TerminalSession
+class TerminalHelper
 
-XTermWidget <|.. TerminalSession
-Widget <|.. XTermWidget
-XTermWidget o.. XTermNative
-WorkbenchView <|.. TerminalTabPresenter.Display
+class TerminalTab.Shim <<generated>> {
+   ~ onRepopulateTerminals(ArrayList<ConsoleProcessInfo>)
+   ~ confirmClose(Command)
+   .. Event Handlers ..
+   + onActivateNamedTerminal(ActivateNamedTerminalEvent)
+   + onAddTerminal(AddTerminalEvent)
+   + onClearTerminal(ClearTerminalEvent)
+   + onCreateTerminal(CreateTerminalEvent)
+   + onRemoveTerminal(RemoveTerminalEvent)
+   + onSendToTerminal(SendToTerminalEvent)
+   .. Command Handlers ..
+   + onActivateTerminal()
+   + onClearTerminalScrollbackBuffer()
+   + onCloseTerminal()
+   + onInterruptTerminal()
+   + onNextTerminal()
+   + onPreviousTerminal()
+   + onRenameTerminal()
+   + onSendTerminalToEditor()
+   + onShowTerminalInfo()
+}
+
+XTermWidget <|-- TerminalSession
+Widget <|-- XTermWidget
+XTermWidget *-- "1" XTermNative
+WorkbenchView <|-- TerminalTabPresenter.Display
+TerminalTab *-- TerminalTab.Shim
+TerminalTab.Shim *-- TerminalTabPresenter
 
 @enduml
 
