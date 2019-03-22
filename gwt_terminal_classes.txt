@@ -4,42 +4,25 @@ header
 Terminal Classes (GWT)
 endheader
 
-interface WorkbenchView {
-   bringToFront()
-   ensureHeight(int)
-   maximize()
-   onBeforeSelected()
-   onBeforeUnselected()
-   onSelected()
-   setProgress(boolean)
+class RemoteServer <<singleton>> {
+   + startTerminal(ConsoleProcessInfo, ConsoleProcess <<callback>>)
 }
-
-class DelayLoadWorkbenchTab<T>
 
 class TerminalTab <TerminalTabPresenter> <<singleton>> {
-   + closeable() : boolean
-   + confirmClose(Command)
-}
-DelayLoadWorkbenchTab <|-- TerminalTab
-
-abstract class BasePresenter {
-   + asWidget() : Widget
-   + getView() : WorkbenchView
-   + onBeforeSelected()
-   + onBeforeUnselected()
-   + onSelected()
+   + closeable(): boolean
+   + confirmClose(onConfirmed: Command)
 }
 
 class TerminalTabPresenter {
    + confirmClose(Command)
-   + onRepopulateTerminals(ArrayList<ConsoleProcessInfo>)
+   + onRepopulateTerminals(procList: ArrayList<ConsoleProcessInfo>)
    .. Event Handlers ..
-   + onActivateNamedTerminal(ActivateNamedTerminalEvent)
-   + onAddToTerminal(AddToTerminalEvent)
-   + onClearTerminal(ClearTerminalEvent)
-   + onCreateTerminal(CreateTerminalEvent)
-   + onRemoveTerminal(RemoveTerminalEvent)
-   + onSendToTerminal(SendToTerminalEvent)
+   + onActivateNamedTerminal(event: ActivateNamedTerminalEvent)
+   + onAddToTerminal(event: AddToTerminalEvent)
+   + onClearTerminal(event: ClearTerminalEvent)
+   + onCreateTerminal(event: CreateTerminalEvent)
+   + onRemoveTerminal(event: RemoveTerminalEvent)
+   + onSendToTerminal(event: SendToTerminalEvent)
    .. Command Handlers ..
    + onActivateTerminal()
    + onClearTerminalScrollbackBuffer()
@@ -52,53 +35,43 @@ class TerminalTabPresenter {
    + onShowTerminalInfo()
 }
 
-BasePresenter <|-- TerminalTabPresenter
-
-interface DisplaySelectedCallback {
-   displaySelected()
-}
-
 interface TerminalTabPresenter.Display {
    activateNamedTerminal(caption, createdByApi)
-   activateTerminal(DisplaySelectedCallback)
-   activeTerminals() : boolean
+   activateTerminal(callback: DisplaySelectedCallback)
+   activeTerminals(): boolean
    addTerminal(ConsoleProcessInfo, hasSession)
-   clearTerminalScrollbackBuffer(caption)
-   createTerminal(postCreateText)
+   clearTerminalScrollbackBuffer(caption: String)
+   createTerminal(postCreateText: String)
    ensureTerminal()
    interruptTerminal()
    nextTerminal()
    previousTerminal()
    removeTerminal(handle)
    renameTerminal()
-   repopulateTerminals(ArrayList<ConsoleProcessInfo>)
+   repopulateTerminals(procList: ArrayList<ConsoleProcessInfo>)
    sendTerminalToEditor()
-   sendToTerminal(text, setFocus)
+   sendToTerminal(text: String, setFocus: boolean)
    showTerminalInfo()
    terminateAllTerminals()
    terminateCurrentTerminal()
 }
 
-class XTermNative <<JavaScriptObject>>
-class Widget
-class XTermWidget
-class TerminalSession
-
-class TerminalHelper <<singleton>> {
-    + warnBeforeClosing(busyMode) : boolean
-    + warnBusyTerminalBeforeCommand(Command, ...)
+class ConsoleProcessFactory <<singleton>> {
+   + interruptAndReap(Handle)
 }
+TerminalTab ..> ConsoleProcessFactory : <<uses>>
+TerminalList ..> ConsoleProcessFactory : <<uses>>
 
-class TerminalTab.Shim <<generated>> {
-   ~ onRepopulateTerminals(ArrayList<ConsoleProcessInfo>)
-   ~ confirmClose(Command)
+abstract class TerminalTab.Shim {
+   ~ confirmClose(onConfirmed: Command)
+   ~ onRepopulateTerminals(procList: ArrayList<ConsoleProcessInfo>)
    .. Event Handlers ..
-   + onActivateNamedTerminal(ActivateNamedTerminalEvent)
-   + onAddTerminal(AddTerminalEvent)
-   + onClearTerminal(ClearTerminalEvent)
-   + onCreateTerminal(CreateTerminalEvent)
-   + onRemoveTerminal(RemoveTerminalEvent)
-   + onSendToTerminal(SendToTerminalEvent)
+   + onActivateNamedTerminal(event: ActivateNamedTerminalEvent)
+   + onAddTerminal(event: AddTerminalEvent)
+   + onClearTerminal(event: ClearTerminalEvent)
+   + onCreateTerminal(event: CreateTerminalEvent)
+   + onRemoveTerminal(event: RemoveTerminalEvent)
+   + onSendToTerminal(event: SendToTerminalEvent)
    .. Command Handlers ..
    + onActivateTerminal()
    + onClearTerminalScrollbackBuffer()
@@ -110,25 +83,6 @@ class TerminalTab.Shim <<generated>> {
    + onSendTerminalToEditor()
    + onShowTerminalInfo()
 }
-
-class ToolbarPane {
-   + bringToFront()
-   + ensureHeight(int)
-   + maximize()
-   + setProgress(boolean)
-}
-
-abstract class WorkbenchPane {
-   + closable() : boolean
-   + confirmClose(Command)
-   + getTitle() : String
-   + isSuppressed() : boolean
-   + onBeforeSelected()
-   + onBeforeUnselected()
-   + onSelected()
-   + prefetch(Command)
-}
-ToolbarPane <|-- WorkbenchPane
 
 class TerminalPane {
    # createMainWidget() : Widget
@@ -144,23 +98,7 @@ class TerminalPane {
 }
 
 TerminalTabPresenter.Display <|.. TerminalPane
-TerminalTabPresenter ..> TerminalTabPresenter.Display : <<use>>
-TerminalTabPresenter ..> TerminalHelper : <<use>>
-
-interface WorkbenchTab {
-   closeable() : boolean
-   confirmClose(Command)
-   getTitle() : String
-   isSuppressed() : boolean
-   onBeforeSelected()
-   onBeforeUnselected()
-   onSelected()
-   prefetch(Command continuation)
-}
-
-WorkbenchView <|.. WorkbenchPane
-WorkbenchTab <|.. WorkbenchPane
-WorkbenchPane <|-- TerminalPane
+TerminalTabPresenter *-- "1" TerminalTabPresenter.Display
 
 class DeckLayoutPanel
 class TerminalPopupMenu
@@ -173,14 +111,59 @@ TerminalPane *-- "1" TerminalList
 XTermWidget <|-- TerminalSession
 Widget <|-- XTermWidget
 XTermWidget *-- "1" XTermNative
-WorkbenchView <|.. TerminalTabPresenter.Display
 TerminalTab *-- "1" TerminalTab.Shim
-TerminalTab.Shim *-- "1" TerminalTabPresenter
+TerminalTab.Shim <|-- TerminalTabPresenter
 TerminalPopupMenu ..> TerminalList : <<use>>
 DeckLayoutPanel o-- "0..*" TerminalSession
 TerminalList *-- "0..*" TerminalSession
 
-hide members
+TerminalSession *-- "1" TerminalSessionSocket
+TerminalSession o-- "0..1" ConsoleProcess
+TerminalSession *-- "1" ConsoleProcessInfo
+ConsoleProcess o-- "1" ConsoleProcessInfo
+TerminalSession --> RemoteServer : <<use>>
+
+interface TerminalSessionSocket.Session {
+   receivedInput(input: String)
+   receivedOutput(output: String)
+   connectionDisconnected()
+}
+
+TerminalSessionSocket.Session <|.. TerminalSession
+
+interface TerminalSessionSocket.ConnectCallback {
+   onConnected()
+   onError(message: String)
+}
+
+class TerminalLocalEcho {
+
+}
+
+class XTermNative <<JavaScriptObject>>
+class Widget
+class XTermWidget
+
+class TerminalSession {
+
+}
+
+class TerminalSessionSocket {
+
+}
+
+TerminalSessionSocket *-- "1" TerminalLocalEcho
+
+class ConsoleProcess {
+
+}
+
+class ConsoleProcessInfo <<JavaScriptObject>> {
+
+}
+
+hide empty fields
+hide empty methods
 
 @enduml
 
