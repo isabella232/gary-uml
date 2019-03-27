@@ -1,21 +1,47 @@
 @startuml
 
-title __Start New Terminal__\n
+title __Start New Terminal From IDE__\n
 
 box "Gwt"
-   participant Commands
-   participant EventBus
    participant TerminalTabPresenter
    participant TerminalPane
+   participant TerminalList
+   participant TerminalSession
+   participant EventBus
    participant ClientEvents
 end box
 
 box "Session"
-   participant "George"
+   participant SessionConsoleProcessApi
+   participant SessionConsoleProcessTable
 endbox
 
-Commands -> TerminalTabPresenter: onNewTerminal
-TerminalTabPresenter -> TerminalPane: activateTerminal
-TerminalPane -> TerminalPane: createTerminal
+[-> TerminalTabPresenter: onNewTerminal
+
+activate TerminalTabPresenter
+TerminalTabPresenter ->> TerminalPane ++ : activateTerminal
+deactivate TerminalTabPresenter
+
+TerminalPane -> TerminalPane: bringToFront
+TerminalPane -> TerminalPane: onSelected
+
+TerminalPane -> TerminalTabPresenter: callback
+deactivate TerminalPane
+
+activate TerminalTabPresenter
+TerminalTabPresenter -> TerminalPane ++ : createTerminal
+deactivate TerminalTabPresenter
+
+TerminalPane -> TerminalList ++ : createNewTerminal
+deactivate TerminalPane
+
+create TerminalSession
+TerminalList -> TerminalSession: connect
+activate TerminalSession
+TerminalList -> EventBus: TerminalBusyEvent
+deactivate TerminalList
+
+TerminalSession -> SessionConsoleProcessApi: startTerminal
+deactivate TerminalSession
 
 @enduml
