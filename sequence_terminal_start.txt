@@ -8,12 +8,12 @@ box "Gwt"
    participant TerminalList
    participant TerminalSession
    participant EventBus
-   participant ClientEvents
 end box
 
 box "Session"
    participant SessionConsoleProcessApi
    participant SessionConsoleProcessTable
+   participant ConsoleProcessSocket
 endbox
 
 [-> TerminalTabPresenter: onNewTerminal
@@ -32,16 +32,17 @@ activate TerminalTabPresenter
 TerminalTabPresenter -> TerminalPane ++ : createTerminal
 deactivate TerminalTabPresenter
 
-TerminalPane -> TerminalList ++ : createNewTerminal
+TerminalPane ->> TerminalList ++ : createNewTerminal
 deactivate TerminalPane
 
 create TerminalSession
-TerminalList -> TerminalSession: connect
+TerminalList ->> TerminalSession: connect
 activate TerminalSession
 TerminalList -> EventBus: TerminalBusyEvent
 deactivate TerminalList
 
-TerminalSession -> SessionConsoleProcessApi: startTerminal
+TerminalSession -> SessionConsoleProcessApi: startTerminalRPC
 deactivate TerminalSession
 
+SessionConsoleProcessApi -> SessionConsoleProcessTable: createTerminalConsoleProc
 @enduml
