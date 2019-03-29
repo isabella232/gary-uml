@@ -1,19 +1,25 @@
 @startuml
 
-title __Start New Terminal From IDE__\n
+title __Start New Terminal From IDE (WebSockets)__\n
 
 box "Gwt"
    participant TerminalTabPresenter
    participant TerminalPane
    participant TerminalList
    participant TerminalSession
+   participant ConsoleProcess
+   participant TerminalSessionSocket
+   participant WebSocket
+   participant JSWebSocket
    participant EventBus
 end box
 
-box "Session"
-   participant SessionConsoleProcessApi
-   participant SessionConsoleProcessTable
+box "RSession"
+   participant ConsoleProcessApi
+   participant ConsoleProcessTable
+   participant ConsoleProc
    participant ConsoleProcessSocket
+   participant ConsoleProcessSocketConnectionCallbacks
 endbox
 
 [-> TerminalTabPresenter: onNewTerminal
@@ -36,13 +42,65 @@ TerminalPane ->> TerminalList ++ : createNewTerminal
 deactivate TerminalPane
 
 create TerminalSession
+TerminalList -> TerminalSession: create
 TerminalList ->> TerminalSession: connect
 activate TerminalSession
+create TerminalSessionSocket
+TerminalSession -> TerminalSessionSocket: create
 TerminalList -> EventBus: TerminalBusyEvent
 deactivate TerminalList
 
-TerminalSession -> SessionConsoleProcessApi: startTerminalRPC
+activate ConsoleProcessApi
+TerminalSession ->> ConsoleProcessApi: startTerminalRPC
 deactivate TerminalSession
 
-SessionConsoleProcessApi -> SessionConsoleProcessTable: createTerminalConsoleProc
+activate ConsoleProcessTable
+ConsoleProcessApi -> ConsoleProcessTable: createTerminalConsoleProc
+create ConsoleProc
+ConsoleProcessTable -> ConsoleProc: createTerminalProcess
+activate ConsoleProc
+ConsoleProc -> ConsoleProcessSocket: ensureServerRunning
+activate ConsoleProcessSocket
+ConsoleProc -> ConsoleProcessTable: addConsoleProcess
+ConsoleProc -> ConsoleProcessTable: saveConsoleProcesses
+
+create ConsoleProcessSocketConnectionCallbacks
+ConsoleProc -> ConsoleProcessSocketConnectionCallbacks: create
+ConsoleProc -> ConsoleProcessSocket: listen with callbacks
+deactivate ConsoleProcessSocket
+
+ConsoleProc -> ConsoleProcessTable: ConsoleProcess
+deactivate ConsoleProc
+
+ConsoleProcessTable --> ConsoleProcessApi: ConsoleProcess
+deactivate ConsoleProcessTable
+
+create ConsoleProcess
+ConsoleProcessApi -> ConsoleProcess: returns
+deactivate ConsoleProcessApi
+
+activate TerminalSession
+ConsoleProcess -> TerminalSession: onResponseReceived
+
+activate TerminalSessionSocket
+TerminalSession ->> TerminalSessionSocket: connect
+deactivate TerminalSession
+
+create WebSocket
+TerminalSessionSocket -> WebSocket: create
+TerminalSessionSocket ->> WebSocket: open
+activate WebSocket
+
+create JSWebSocket
+WebSocket ->> JSWebSocket: open
+activate JSWebSocket
+deactivate WebSocket
+
+JSWebSocket ->> ConsoleProcessSocket: connect
+deactivate JSWebSocket
+activate ConsoleProcessSocket
+
+TerminalSessionSocket -> TerminalSession: onConnected
+activate TerminalSession
+
 @enduml
