@@ -1,16 +1,69 @@
 @startuml
 
-header
-Terminal Classes (GWT)
-endheader
+title __Terminal Classes__\n
 
-class RemoteServer <<singleton>> {
-   + startTerminal(ConsoleProcessInfo, ConsoleProcess <<callback>>)
+package org.rstudio.studio.client.server.remote {
+   class RemoteServer <<singleton>> {
+      + startTerminal(ConsoleProcessInfo, ConsoleProcess <<callback>>)
+   }
+}
+
+class TerminalDiagnostics {
+   - diagnostic_ : StringBuilder
+   + log()
+   + getLog()
+   + resetLog()
+}
+
+class TerminalHelper {
+   - warnBeforeClosing_ : boolean
+   ~ TerminalHelper()
+   + warnBeforeClosing()
+   + warnBusyTerminalBeforeCommand()
 }
 
 class TerminalTab <TerminalTabPresenter> <<singleton>> {
-   + closeable(): boolean
-   + confirmClose(onConfirmed: Command)
+   - pConsoleProcessFactory_ : Provider<ConsoleProcessFactory>
+   + TerminalTab()
+   + closeable()
+   + confirmClose()
+   - addTerminalProcInfo()
+}
+
+class TerminalList {
+   - terminals_ : LinkedHashMap<String, TerminalListData>
+   - pConsoleProcessFactory_ : Provider<ConsoleProcessFactory>
+   # TerminalList()
+   - initialize()
+   + addTerminal()
+   + addTerminal()
+   + retitleTerminal()
+   - setChildProcs()
+   - setCwd()
+   + setZombie()
+   + setExitCode()
+   + setCaption()
+   ~ removeTerminal()
+   ~ terminateAll()
+   + terminalCount()
+   + indexOfTerminal()
+   + terminalHandleAtIndex()
+   + isCaptionAvailable()
+   + handleForCaption()
+   + autoCloseForHandle()
+   - getMetadataForHandle()
+   - getFullMetadataForHandle()
+   + createNewTerminal()
+   + reconnectTerminal()
+   + getCaption()
+   + getHasSubprocs()
+   + haveSubprocs()
+   - startTerminal()
+   - updateTerminalBusyStatus()
+   + iterator()
+   + onTerminalSubprocs()
+   + onTerminalCwd()
+   + debug_dumpTerminalList()
 }
 
 class TerminalTabPresenter {
@@ -56,32 +109,26 @@ interface TerminalTabPresenter.Display {
    terminateCurrentTerminal()
 }
 
-class ConsoleProcessFactory <<singleton>> {
-   + interruptAndReap(Handle)
-}
-TerminalTab ..> ConsoleProcessFactory : <<uses>>
-TerminalList ..> ConsoleProcessFactory : <<uses>>
-
 abstract class Shim {
-   ~ confirmClose(onConfirmed: Command)
-   ~ onRepopulateTerminals(procList: ArrayList<ConsoleProcessInfo>)
-   .. Event Handlers ..
-   + onActivateNamedTerminal(event: ActivateNamedTerminalEvent)
-   + onAddTerminal(event: AddTerminalEvent)
-   + onClearTerminal(event: ClearTerminalEvent)
-   + onCreateTerminal(event: CreateTerminalEvent)
-   + onRemoveTerminal(event: RemoveTerminalEvent)
-   + onSendToTerminal(event: SendToTerminalEvent)
+   {abstract} ~ confirmClose()
+   {abstract} ~ onRepopulateTerminals()
+    .. Event Handlers ..
+   + {abstract} onActivateNamedTerminal(event: ActivateNamedTerminalEvent)
+   + {abstract} onAddTerminal(event: AddTerminalEvent)
+   + {abstract} onClearTerminal(event: ClearTerminalEvent)
+   + {abstract} onCreateTerminal(event: CreateTerminalEvent)
+   + {abstract} onRemoveTerminal(event: RemoveTerminalEvent)
+   + {abstract} onSendToTerminal(event: SendToTerminalEvent)
    .. Command Handlers ..
-   + onActivateTerminal()
-   + onClearTerminalScrollbackBuffer()
-   + onCloseTerminal()
-   + onInterruptTerminal()
-   + onNextTerminal()
-   + onPreviousTerminal()
-   + onRenameTerminal()
-   + onSendTerminalToEditor()
-   + onShowTerminalInfo()
+   {abstract} + onActivateTerminal()
+   {abstract} + onClearTerminalScrollbackBuffer()
+   {abstract} + onCloseTerminal()
+   {abstract} + onInterruptTerminal()
+   {abstract} + onNextTerminal()
+   {abstract} + onPreviousTerminal()
+   {abstract} + onRenameTerminal()
+   {abstract} + onSendTerminalToEditor()
+   {abstract} + onShowTerminalInfo()
 }
 
 class TerminalPane {
@@ -102,7 +149,6 @@ TerminalTabPresenter *-- "1" TerminalTabPresenter.Display
 
 class DeckLayoutPanel
 class TerminalPopupMenu
-class TerminalList
 
 TerminalPane *-- "1" DeckLayoutPanel
 TerminalPane *-- "1" TerminalPopupMenu
@@ -111,8 +157,8 @@ TerminalPane *-- "1" TerminalList
 XTermWidget <|-- TerminalSession
 Widget <|-- XTermWidget
 XTermWidget *-- "1" XTermNative
-TerminalTab *-- "1" Shim
-TerminalTab +-- Shim
+
+
 Shim <|-- TerminalTabPresenter
 TerminalPopupMenu ..> TerminalList : <<use>>
 DeckLayoutPanel o-- "0..*" TerminalSession
@@ -145,9 +191,61 @@ class XTermNative <<JavaScriptObject>>
 class Widget
 class XTermWidget
 
-class TerminalSession {
-
-}
+   class TerminalSession {
+   - title_ : String
+   - hasChildProcs_ : HasValue<Boolean>
+   - connected_ : boolean
+   - connecting_ : boolean
+   - terminating_ : boolean
+   - reloading_ : boolean
+   - deferredOutput_ : ArrayList<String>
+   - restartSequenceWritten_ : boolean
+   - inputQueue_ : StringBuilder
+   - inputSequence_ : int
+   - newTerminal_ : boolean
+   - showAltAfterReload_ : boolean
+   - createdByApi_ : boolean
+   + TerminalSession()
+   - initialize()
+   + connect()
+   + disconnect()
+   + onResizeTerminal()
+   + receivedOutput()
+   + connectionDisconnected()
+   + receivedSendToTerminal()
+   + receivedInput()
+   - sendUserInput()
+   - doLocalEcho()
+   + onXTermTitle()
+   + setTitle()
+   + getTitle()
+   + getCaption()
+   + clearBuffer()
+   + interruptTerminal()
+   # addHandlerRegistration()
+   # unregisterHandlers()
+   # writeError()
+   # onLoad()
+   # onDetach()
+   + setVisible()
+   + getHandle()
+   + getHasChildProcs()
+   + setHasChildProcs()
+   + addHasChildProcsChangeHandler()
+   + terminate()
+   - cleanupAfterTerminate()
+   + onSessionSerialization()
+   + isConnected()
+   # terminalReady()
+   - shellSupportsReload()
+   - fetchNextChunk()
+   + showZombieMessage()
+   + writeRestartSequence()
+   - setNewTerminal()
+   + getProcInfo()
+   + getBuffer()
+   + getSocket()
+   }
 
 class TerminalSessionSocket {
 
@@ -162,6 +260,10 @@ class ConsoleProcess {
 class ConsoleProcessInfo <<JavaScriptObject>> {
 
 }
+
+TerminalTab -up-|> DelayLoadWorkbenchTab
+TerminalTab o-- Shim : shim_
+TerminalTab +-down- Shim
 
 hide empty fields
 hide empty methods

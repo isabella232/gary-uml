@@ -1,92 +1,128 @@
 @startuml
 
-header
-Start Session Job
-endheader
+title __Start New Terminal From IDE (WebSockets)__\n
 
 box "Gwt"
-    participant JobManager
-    participant JobLauncherDialog
-    participant ClientEvents
+   participant TerminalTabPresenter
+   participant TerminalPane
+   participant TerminalList
+   participant TerminalSession
+   participant ConsoleProcess
+   participant TerminalSessionSocket
+   participant WebSocket
+   participant JSWebSocket
+   participant EventBus
 end box
 
-box "Session"
-    participant SessionJobs
-    participant ScriptJob << AsyncRProcess >>
-    participant RProcess
-    participant JobsApi
-    participant Job
+box "RSession"
+   participant ConsoleProcessApi
+   participant ConsoleProcessTable
+   participant ConsoleProc
+   participant ConsoleProcessSocket
+   participant SocketCallbacks
+   participant ProcessSupervisor
+   participant ProcessCallbacks
 endbox
 
-JobManager -> JobLauncherDialog : shows
-activate JobLauncherDialog
-JobLauncherDialog -> JobManager : JobLaunchSpec
-deactivate JobLauncherDialog
+[-> TerminalTabPresenter: onNewTerminal
 
-JobManager -> SessionJobs : run_script_job
-SessionJobs -> ScriptJob : startScriptJob
-activate ScriptJob
+activate TerminalTabPresenter
+TerminalTabPresenter ->> TerminalPane ++ : activateTerminal
+deactivate TerminalTabPresenter
 
-ScriptJob -> JobsApi : addJob
-JobsApi -> Job : create
-activate Job
+TerminalPane -> TerminalPane: bringToFront
+TerminalPane -> TerminalPane: onSelected
 
-ScriptJob -> RProcess : start process
-activate RProcess
+TerminalPane -> TerminalTabPresenter: callback
+deactivate TerminalPane
 
-ScriptJob -> ScriptJob : add to ScriptJob list
-group Start Running
-RProcess -> ScriptJob : stdout count-ESC
-ScriptJob -> Job : setProgressMax
-ScriptJob -> JobsApi : setJobState (Running)
-JobsApi -> Job : setState (Running)
-Job -> Job : save started
-JobsApi -> ClientEvents : JobUpdated
-end
+activate TerminalTabPresenter
+TerminalTabPresenter -> TerminalPane ++ : createTerminal
+deactivate TerminalTabPresenter
 
-opt Report zero or more named sections
-RProcess -> ScriptJob : stdout section-ESC
-ScriptJob -> JobsApi : setJobStatus <text>
-JobsApi -> Job : setStatus
-JobsApi -> ClientEvents : JobUpdated
-end
+TerminalPane ->> TerminalList ++ : createNewTerminal
+deactivate TerminalPane
 
-loop ProgressMax times
-RProcess -> ScriptJob : stdout statementCount-ESC
-ScriptJob -> JobsApi : setJobProgress
-JobsApi -> Job : setProgress
-JobsApi -> ClientEvents : JobUpdated
-end
+create TerminalSession
+TerminalList -> TerminalSession: create
+TerminalList ->> TerminalSession: connect
+activate TerminalSession
+create TerminalSessionSocket
+TerminalSession -> TerminalSessionSocket: create
+TerminalList -> EventBus: TerminalBusyEvent
+deactivate TerminalList
 
-loop stdout
-RProcess -> ScriptJob : onStdout
-ScriptJob -> Job : addOutput
-Job -> Job : append to log
-Job -> ClientEvents : JobOutput (if listening)
-end
+activate ConsoleProcessApi
+TerminalSession ->> ConsoleProcessApi: startTerminalRPC
+deactivate TerminalSession
 
-loop stderr
-RProcess -> ScriptJob : onStderr
-ScriptJob -> Job : addOutput
-Job -> Job : append to log
-Job -> ClientEvents : JobOutput (if listening)
-end
+activate ConsoleProcessTable
+ConsoleProcessApi -> ConsoleProcessTable: createTerminalConsoleProc
+create ConsoleProc
+ConsoleProcessTable -> ConsoleProc: createTerminalProcess
+activate ConsoleProc
+ConsoleProc -> ConsoleProcessSocket: ensureServerRunning
+activate ConsoleProcessSocket
+ConsoleProc -> ConsoleProcessTable: addConsoleProcess
+ConsoleProc -> ConsoleProcessTable: saveConsoleProcesses
 
-group Job Finished
-RProcess -> ScriptJob : stdout completed-ESC
-ScriptJob -> JobsApi : setJobStatus <blank>
-JobsApi -> Job : setStatus
-JobsApi -> ClientEvents : JobUpdated
-end
+create SocketCallbacks
+ConsoleProc -> SocketCallbacks: create
+ConsoleProc -> ConsoleProcessSocket: listen with callbacks
+deactivate ConsoleProcessSocket
 
-RProcess -> ScriptJob : onCompleted exitStatus
-destroy RProcess
-ScriptJob -> JobsApi : setJobState (success/failure)
-JobsApi -> Job : setState
-Job -> Job : save completed_
-JobsApi -> ClientEvents :  JobUpdated
+ConsoleProc -> ConsoleProcessTable: ConsoleProc
+deactivate ConsoleProc
 
-ScriptJob -> ScriptJob : remove from ScriptJob list
-destroy ScriptJob
+ConsoleProcessTable --> ConsoleProcessApi: ConsoleProc
+deactivate ConsoleProcessTable
+
+create ConsoleProcess
+ConsoleProcessApi -> ConsoleProcess: returns
+deactivate ConsoleProcessApi
+
+activate TerminalSession
+ConsoleProcess -> TerminalSession: onResponseReceived
+
+activate TerminalSessionSocket
+TerminalSession ->> TerminalSessionSocket: connect
+deactivate TerminalSession
+
+create WebSocket
+TerminalSessionSocket -> WebSocket: create
+TerminalSessionSocket ->> WebSocket: open
+activate WebSocket
+
+create JSWebSocket
+WebSocket ->> JSWebSocket: open
+activate JSWebSocket
+deactivate WebSocket
+
+JSWebSocket ->> ConsoleProcessSocket: connect
+deactivate JSWebSocket
+activate ConsoleProcessSocket
+
+ConsoleProcessSocket -> ConsoleProcessSocket: onOpen
+
+TerminalSessionSocket -> TerminalSession: onConnected
+activate TerminalSession
+TerminalSession ->> ConsoleProcess: start
+deactivate TerminalSession
+activate ConsoleProcess
+ConsoleProcess ->> ConsoleProcessApi: processStartRPC
+activate ConsoleProcessApi
+ConsoleProcessApi -> ConsoleProcessTable: findProcByHandle
+activate ConsoleProcessTable
+ConsoleProcessTable -> ConsoleProcessApi: ConsoleProc
+deactivate ConsoleProcessTable
+ConsoleProcessApi -> ConsoleProc: start
+deactivate ConsoleProcessApi
+activate ConsoleProc
+
+create ProcessCallbacks
+ConsoleProc -> ProcessCallbacks: create
+ConsoleProc ->> ProcessSupervisor: runTerminal
+deactivate ConsoleProc
+activate ProcessSupervisor
 
 @enduml
