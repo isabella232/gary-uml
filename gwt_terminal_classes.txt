@@ -62,7 +62,7 @@ class ConsoleProcessFactory <<singleton>> {
 TerminalTab ..> ConsoleProcessFactory : <<uses>>
 TerminalList ..> ConsoleProcessFactory : <<uses>>
 
-abstract class TerminalTab.Shim {
+abstract class Shim {
    ~ confirmClose(onConfirmed: Command)
    ~ onRepopulateTerminals(procList: ArrayList<ConsoleProcessInfo>)
    .. Event Handlers ..
@@ -111,8 +111,9 @@ TerminalPane *-- "1" TerminalList
 XTermWidget <|-- TerminalSession
 Widget <|-- XTermWidget
 XTermWidget *-- "1" XTermNative
-TerminalTab *-- "1" TerminalTab.Shim
-TerminalTab.Shim <|-- TerminalTabPresenter
+TerminalTab *-- "1" Shim
+TerminalTab +-- Shim
+Shim <|-- TerminalTabPresenter
 TerminalPopupMenu ..> TerminalList : <<use>>
 DeckLayoutPanel o-- "0..*" TerminalSession
 TerminalList *-- "0..*" TerminalSession
