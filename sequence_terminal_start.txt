@@ -19,7 +19,9 @@ box "RSession"
    participant ConsoleProcessTable
    participant ConsoleProc
    participant ConsoleProcessSocket
-   participant ConsoleProcessSocketConnectionCallbacks
+   participant SocketCallbacks
+   participant ProcessSupervisor
+   participant ProcessCallbacks
 endbox
 
 [-> TerminalTabPresenter: onNewTerminal
@@ -64,15 +66,15 @@ activate ConsoleProcessSocket
 ConsoleProc -> ConsoleProcessTable: addConsoleProcess
 ConsoleProc -> ConsoleProcessTable: saveConsoleProcesses
 
-create ConsoleProcessSocketConnectionCallbacks
-ConsoleProc -> ConsoleProcessSocketConnectionCallbacks: create
+create SocketCallbacks
+ConsoleProc -> SocketCallbacks: create
 ConsoleProc -> ConsoleProcessSocket: listen with callbacks
 deactivate ConsoleProcessSocket
 
-ConsoleProc -> ConsoleProcessTable: ConsoleProcess
+ConsoleProc -> ConsoleProcessTable: ConsoleProc
 deactivate ConsoleProc
 
-ConsoleProcessTable --> ConsoleProcessApi: ConsoleProcess
+ConsoleProcessTable --> ConsoleProcessApi: ConsoleProc
 deactivate ConsoleProcessTable
 
 create ConsoleProcess
@@ -100,7 +102,27 @@ JSWebSocket ->> ConsoleProcessSocket: connect
 deactivate JSWebSocket
 activate ConsoleProcessSocket
 
+ConsoleProcessSocket -> ConsoleProcessSocket: onOpen
+
 TerminalSessionSocket -> TerminalSession: onConnected
 activate TerminalSession
+TerminalSession ->> ConsoleProcess: start
+deactivate TerminalSession
+activate ConsoleProcess
+ConsoleProcess ->> ConsoleProcessApi: processStartRPC
+activate ConsoleProcessApi
+ConsoleProcessApi -> ConsoleProcessTable: findProcByHandle
+activate ConsoleProcessTable
+ConsoleProcessTable -> ConsoleProcessApi: ConsoleProc
+deactivate ConsoleProcessTable
+ConsoleProcessApi -> ConsoleProc: start
+deactivate ConsoleProcessApi
+activate ConsoleProc
+
+create ProcessCallbacks
+ConsoleProc -> ProcessCallbacks: create
+ConsoleProc ->> ProcessSupervisor: runTerminal
+deactivate ConsoleProc
+activate ProcessSupervisor
 
 @enduml
