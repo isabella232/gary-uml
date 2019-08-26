@@ -6,11 +6,13 @@ box "Gwt"
    participant TerminalTabPresenter
    participant TerminalPane
    participant TerminalList
+   participant DeckLayoutPanel
    participant TerminalSession
    participant ConsoleProcess
    participant TerminalSessionSocket
    participant WebSocket
    participant JSWebSocket
+   participant XTermNative
    participant EventBus
 end box
 
@@ -43,12 +45,14 @@ deactivate TerminalTabPresenter
 TerminalPane ->> TerminalList ++ : createNewTerminal
 deactivate TerminalPane
 
+TerminalList -> TerminalList: startTerminal
 create TerminalSession
 TerminalList -> TerminalSession: create
-TerminalList ->> TerminalSession: connect
 activate TerminalSession
 create TerminalSessionSocket
 TerminalSession -> TerminalSessionSocket: create
+TerminalList ->> TerminalSession: connect
+
 TerminalList -> EventBus: TerminalBusyEvent
 deactivate TerminalList
 
@@ -110,13 +114,14 @@ TerminalSession ->> ConsoleProcess: start
 deactivate TerminalSession
 activate ConsoleProcess
 ConsoleProcess ->> ConsoleProcessApi: processStartRPC
+deactivate TerminalSession
+deactivate ConsoleProcess
 activate ConsoleProcessApi
 ConsoleProcessApi -> ConsoleProcessTable: findProcByHandle
 activate ConsoleProcessTable
 ConsoleProcessTable -> ConsoleProcessApi: ConsoleProc
 deactivate ConsoleProcessTable
 ConsoleProcessApi -> ConsoleProc: start
-deactivate ConsoleProcessApi
 activate ConsoleProc
 
 create ProcessCallbacks
@@ -125,4 +130,14 @@ ConsoleProc ->> ProcessSupervisor: runTerminal
 deactivate ConsoleProc
 activate ProcessSupervisor
 
+ConsoleProcessApi -> TerminalSession: onResponseReceived
+deactivate ConsoleProcessApi
+activate TerminalSession
+TerminalSession -> EventBus: TerminalSessionStartedEvent
+deactivate TerminalSession
+
+EventBus -> TerminalPane: onTerminalSessionStarted
+activate TerminalPane
+TerminalPane -> DeckLayoutPanel: add
+TerminalPane -> TerminalPane: showTerminalWidget
 @enduml
