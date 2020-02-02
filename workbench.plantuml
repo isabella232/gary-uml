@@ -1,0 +1,127 @@
+@startuml
+
+title __WORKBENCH Class Diagram__\n
+
+abstract class MessageDisplay {
+   # createDialog() {abstract}
+   + promptForInteger() {abstract}
+   + promptForText() {abstract}
+   + promptForTextWithOption() {abstract}
+   + public void promptForPassword()
+   + showErrorMessage()
+   + showGenericDialog()
+   + showMessage()
+   + showNotYetImplemented()
+   + showPopupBlockedMessage()
+   + showYesNoMessage()
+}
+hide MessageDisplay methods
+
+abstract class GlobalDisplay {
+   + openWindow() {abstract}
+   + openWindow() {abstract}
+   + openProgressWindow() {abstract}
+   + openMinimalWindow() {abstract}
+   + openWebMinimalWindow() {abstract}
+   + openSatelliteWindow() {abstract}
+   + openEmailComposeWindow() {abstract}
+   + showHtmlFile() {abstract}
+   + showWordDoc() {abstract}
+   + showPptPresentation() {abstract}
+   + openRStudioLink()
+   + void openRStudioLink() {abstract}
+   + showProgress() {abstract}
+   + showLicenseWarningBar() {abstract}
+   + showWarningBar() {abstract}
+   + hideWarningBar() {abstract}
+   + getProgressIndicator() {abstract}
+}
+hide GlobalDisplay methods
+
+MessageDisplay <|-- GlobalDisplay
+
+class DefaultGlobalDisplay <<Singleton>> {
+}
+
+GlobalDisplay <|.. DefaultGlobalDisplay
+DefaultGlobalDisplay --> ApplicationView : view_
+
+class SatelliteManager <<Singleton>> {
+}
+
+class ApplicationVisibility <<Singleton>> {
+}
+ApplicationVisibility --> SatelliteManager
+
+class RStudio <<Entrypoint>> {
+}
+
+class Application <<Singleton>> {
+   - rootPanel_ : RootLayoutPanel
+   + go()
+}
+
+RStudio --> Application
+
+interface ApplicationView {
+   focusToolbar()
+   getWidget()
+   hideSerializationProgress()
+   hideWarning()
+   isToolbarShowing()
+   reportStatus()
+   showApplicationAgreement()
+   showApplicationDisconnected()
+   showApplicationMultiSessionQuit()
+   showApplicationOffline()
+   showApplicationQuit()
+   showApplicationSuicide()
+   showApplicationUpdateRequired()
+   showLicenseWarning()
+   showSerializationProgress()
+   showSessionAbendWarning()
+   showToolbar()
+   showWarning()
+   showWorkbenchView()
+}
+hide ApplicationView methods
+
+class ApplicationWindow <<Singleton, Composite>> {
+}
+
+Application --> ApplicationView : view_
+Application --> SatelliteManager
+ApplicationView <|.. ApplicationWindow
+
+class Widget {
+}
+
+interface WorkbenchMainView <<Widget>> {
+}
+
+class WorkbenchScreen <<Composite>> {
+}
+
+WorkbenchMainView <|.. WorkbenchScreen
+
+class Workbench {
+}
+
+class WorkbenchContext <<Singleton>> {
+}
+
+Workbench --> WorkbenchMainView : view_
+Workbench --> WorkbenchContext
+ApplicationWindow --> WorkbenchMainView : workbenchScreen_
+
+interface ApplicationHeader <<IsWidget>> {
+}
+
+class WebApplicationHeader <<Composite>> {
+}
+
+ApplicationHeader <|-- WebApplicationHeader
+
+ApplicationWindow --> ApplicationHeader : applicationHeader_
+
+@enduml
