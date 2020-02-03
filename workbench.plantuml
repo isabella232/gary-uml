@@ -16,6 +16,7 @@ abstract class MessageDisplay {
    + showYesNoMessage()
 }
 hide MessageDisplay methods
+hide MessageDisplay fields
 
 abstract class GlobalDisplay {
    + openWindow() {abstract}
@@ -37,30 +38,38 @@ abstract class GlobalDisplay {
    + getProgressIndicator() {abstract}
 }
 hide GlobalDisplay methods
-
+hide GlobalDisplay fields
 MessageDisplay <|-- GlobalDisplay
 
 class DefaultGlobalDisplay <<Singleton>> {
 }
-
+hide DefaultGlobalDisplay methods
+hide DefaultGlobalDisplay fields
 GlobalDisplay <|.. DefaultGlobalDisplay
-DefaultGlobalDisplay --> ApplicationView : view_
+DefaultGlobalDisplay --> ApplicationView
 
 class SatelliteManager <<Singleton>> {
 }
+hide SatelliteManager methods
+hide SatelliteManager fields
 
 class ApplicationVisibility <<Singleton>> {
 }
 ApplicationVisibility --> SatelliteManager
+hide ApplicationVisibility methods
+hide ApplicationVisibility fields
 
 class RStudio <<Entrypoint>> {
 }
+hide RStudio methods
+hide RStudio fields
 
 class Application <<Singleton>> {
    - rootPanel_ : RootLayoutPanel
    + go()
 }
-
+hide Application methods
+hide Application fields
 RStudio --> Application
 
 interface ApplicationView {
@@ -85,43 +94,138 @@ interface ApplicationView {
    showWorkbenchView()
 }
 hide ApplicationView methods
+hide ApplicationView fields
 
-class ApplicationWindow <<Singleton, Composite>> {
+class ApplicationWindow <<Singleton, Composite:LayoutPanel>> {
 }
-
-Application --> ApplicationView : view_
+hide ApplicationWindow methods
+hide ApplicationWindow fields
+Application *-- ApplicationView
 Application --> SatelliteManager
 ApplicationView <|.. ApplicationWindow
 
-class Widget {
-}
-
 interface WorkbenchMainView <<Widget>> {
 }
+hide WorkbenchMainView fields
+hide WorkbenchMainView methods
 
-class WorkbenchScreen <<Composite>> {
+class WorkbenchScreen <<Composite:MainSplitPanel>> {
 }
-
+hide WorkbenchScreen methods
+hide WorkbenchScreen fields
 WorkbenchMainView <|.. WorkbenchScreen
 
 class Workbench {
 }
+hide Workbench fields
+hide Workbench methods
 
 class WorkbenchContext <<Singleton>> {
 }
-
-Workbench --> WorkbenchMainView : view_
+hide WorkbenchContext fields
+hide WorkbenchContext methods
+Workbench --> WorkbenchMainView
 Workbench --> WorkbenchContext
-ApplicationWindow --> WorkbenchMainView : workbenchScreen_
+ApplicationWindow *-- WorkbenchMainView
 
 interface ApplicationHeader <<IsWidget>> {
 }
+hide ApplicationHeader fields
+hide ApplicationHeader methods
 
-class WebApplicationHeader <<Composite>> {
+class WebApplicationHeader <<Composite: FlowPanel>> {
 }
-
+hide WebApplicationHeader fields
+hide WebApplicationHeader methods
 ApplicationHeader <|-- WebApplicationHeader
+ApplicationWindow *-- ApplicationHeader
 
-ApplicationWindow --> ApplicationHeader : applicationHeader_
+class AppMenuBar {
+}
+hide AppMenuBar methods
+hide AppMenuBar fields
+WebApplicationHeader *-- AppMenuBar
+
+class GlobalToolbar {
+}
+hide GlobalToolbar methods
+hide GlobalToolbar fields
+WebApplicationHeader *-- GlobalToolbar
+
+class MainSplitPanel {
+}
+hide MainSplitPanel methods
+hide MainSplitPanel fields
+WorkbenchScreen --> MainSplitPanel
+
+class LogicalWindow {
+}
+hide LogicalWindow methods
+hide LogicalWindow fields
+
+class WindowFrame {
+}
+hide WindowFrame methods
+hide WindowFrame fields
+class MinimizedWindowFrame {
+}
+hide MinimizedWindowFrame methods
+hide MinimizedWindowFrame fields
+LogicalWindow *-- WindowFrame
+LogicalWindow *-- MinimizedWindowFrame
+
+class TabLayoutPanel {
+}
+hide TabLayoutPanel methods
+hide TabLayoutPanel fields
+
+class ModuleTabLayoutPanel {
+}
+hide ModuleTabLayoutPanel methods
+hide ModuleTabLayoutPanel fields
+TabLayoutPanel <|-- ModuleTabLayoutPanel
+
+class WorkbenchTabPanel <<Composite: LayoutPanel>> {
+}
+hide WorkbenchTabPanel methods
+hide WorkbenchTabPanel fields
+WorkbenchTabPanel *-- ModuleTabLayoutPanel
+
+class ConsoleTabPanel {
+}
+hide ConsoleTabPanel methods
+hide ConsoleTabPanel fields
+WorkbenchTabPanel <|-- ConsoleTabPanel
+
+class PaneManager {
+   - createConsole() : LogicalWindow
+   - createSource() : LogicalWindow
+   - createTabSet() : LogicalWindow
+}
+hide PaneManager fields
+WorkbenchScreen *-- PaneManager
+PaneManager *-- MainSplitPanel
+PaneManager *-- "4" LogicalWindow
+PaneManager *-- ConsoleTabPanel
+
+class DualWindowLayoutPanel {
+}
+hide DualWindowLayoutPanel methods
+hide DualWindowLayoutPanel fields
+DualWindowLayoutPanel *-- "2 (top/bottom)" LogicalWindow
+
+MainSplitPanel *-- "2 (left/right)" DualWindowLayoutPanel
+
+class PrimaryWindowFrame {
+}
+hide PrimaryWindowFrame methods
+hide PrimaryWindowFrame fields
+WindowFrame <|-- PrimaryWindowFrame
+
+class MinimizedModuleTabLayoutPanel {
+}
+hide MinimizedModuleTabLayoutPanel methods
+hide MinimizedModuleTabLayoutPanel fields
+MinimizedWindowFrame <|-- MinimizedModuleTabLayoutPanel
 
 @enduml
