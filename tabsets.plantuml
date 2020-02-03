@@ -1,0 +1,175 @@
+@startuml
+
+title __TabSet1 and 2 Class Diagram__\n
+
+class HistoryTab<History> {
+}
+hide HistoryTab methods
+hide HistoryTab fields
+hide HistoryTab
+DelayLoadWorkbenchTab <|-- HistoryTab
+
+class FilesTab<Files> {
+}
+hide FilesTab methods
+hide FilesTab fields
+hide FilesTab
+DelayLoadWorkbenchTab <|-- FilesTab
+
+class PlotsTab<Plots> {
+}
+hide PlotsTab methods
+hide PlotsTab fields
+hide PlotsTab
+DelayLoadWorkbenchTab <|-- PlotsTab
+
+class PackagesTab<Packages> {
+}
+hide PackagesTab methods
+hide PackagesTab fields
+hide PackagesTab
+DelayLoadWorkbenchTab <|-- PackagesTab
+
+class HelpTab<Help> {
+}
+hide HelpTab methods
+hide HelpTab fields
+hide HelpTab
+DelayLoadWorkbenchTab <|-- HelpTab
+
+class VCSTab<VCSPresenter> {
+}
+hide VCSTab methods
+hide VCSTab fields
+hide VCSTab
+DelayLoadWorkbenchTab <|-- VCSTab
+
+class BuildTab<BuildPresenter> {
+}
+hide BuildTab methods
+hide BuildTab fields
+hide BuildTab
+DelayLoadWorkbenchTab <|-- BuildTab
+
+class PresentationTab<Presentation> {
+}
+hide PresentationTab methods
+hide PresentationTab fields
+hide PresentationTab
+DelayLoadWorkbenchTab <|-- PresentationTab
+
+class ConnectionsTab<ConnectionsPresenter> {
+}
+hide ConnectionsTab methods
+hide ConnectionsTab fields
+hide ConnectionsTab
+DelayLoadWorkbenchTab <|-- ConnectionsTab
+
+class CompilePdfOutputTab<CompilePdfOutputPresenter> {
+}
+hide CompilePdfOutputTab methods
+hide CompilePdfOutputTab fields
+hide CompilePdfOutputTab
+DelayLoadWorkbenchTab <|-- CompilePdfOutputTab
+
+class RenderRmdOutputTab<RenderRmdOutputPresenter> {
+}
+hide RenderRmdOutputTab methods
+hide RenderRmdOutputTab fields
+hide RenderRmdOutputTab
+DelayLoadWorkbenchTab <|-- RenderRmdOutputTab
+
+class FindOutputTab<FindOutputPresenter> {
+}
+hide FindOutputTab methods
+hide FindOutputTab fields
+hide FindOutputTab
+DelayLoadWorkbenchTab <|-- FindOutputTab
+
+interface WorkbenchTab {
+}
+hide WorkbenchTab methods
+hide WorkbenchTab fields
+
+abstract class DelayLoadWorkbenchTab<T> {
+}
+hide DelayLoadWorkbenchTab methods
+hide DelayLoadWorkbenchTab fields
+WorkbenchTab <|.. DelayLoadWorkbenchTab
+
+
+class SourceCppOutputTab<SourceCppOutputPresenter> {
+}
+hide SourceCppOutputTab methods
+hide SourceCppOutputTab fields
+hide SourceCppOutputTab
+DelayLoadWorkbenchTab <|-- SourceCppOutputTab
+
+class RSConnectDeployOutputTab<RSConnectDeployOutputPresenter> {
+}
+hide RSConnectDeployOutputTab methods
+hide RSConnectDeployOutputTab fields
+hide RSConnectDeployOutputTab
+DelayLoadWorkbenchTab <|-- RSConnectDeployOutputTab
+
+class MarkersOutputTab<MarkersOutputPresenter> {
+}
+hide MarkersOutputTab methods
+hide MarkersOutputTab fields
+hide MarkersOutputTab
+DelayLoadWorkbenchTab <|-- MarkersOutputTab
+
+class TerminalTab<TerminalTabPresenter> {
+}
+hide TerminalTab methods
+hide TerminalTab fields
+hide TerminalTab
+DelayLoadWorkbenchTab <|-- TerminalTab
+
+class TestsOutputTab<TestsOutputPresenter> {
+}
+hide TestsOutputTab methods
+hide TestsOutputTab fields
+hide TestsOutputTab
+DelayLoadWorkbenchTab <|-- TestsOutputTab
+
+class JobsTab<JobsPresenter> {
+}
+hide JobsTab methods
+hide JobsTab fields
+hide JobsTab
+DelayLoadWorkbenchTab <|-- JobsTab
+
+class LauncherJobsTab<LauncherJobsPresenter> {
+}
+hide LauncherJobsTab methods
+hide LauncherJobsTab fields
+hide LauncherJobsTab
+DelayLoadWorkbenchTab <|-- LauncherJobsTab
+
+class DataOutputTab<DataOutputPresenter> {
+}
+hide DataOutputTab methods
+hide DataOutputTab fields
+hide DataOutputTab
+DelayLoadWorkbenchTab <|-- DataOutputTab
+
+class TutorialTab<TutorialPresenter> {
+}
+hide TutorialTab methods
+hide TutorialTab fields
+hide TutorialTab
+DelayLoadWorkbenchTab <|-- TutorialTab
+
+class EnvironmentTab<EnvironmentPresenter> {
+}
+hide EnvironmentTab methods
+hide EnvironmentTab fields
+DelayLoadWorkbenchTab <|-- EnvironmentTab
+
+class ViewerTab<ViewerPresenter> {
+}
+hide ViewerTab methods
+hide ViewerTab fields
+DelayLoadWorkbenchTab <|-- ViewerTab
+

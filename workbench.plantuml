@@ -45,19 +45,13 @@ class DefaultGlobalDisplay <<Singleton>> {
 }
 hide DefaultGlobalDisplay methods
 hide DefaultGlobalDisplay fields
-GlobalDisplay <|.. DefaultGlobalDisplay
+GlobalDisplay <|-- DefaultGlobalDisplay
 DefaultGlobalDisplay --> ApplicationView
 
 class SatelliteManager <<Singleton>> {
 }
 hide SatelliteManager methods
 hide SatelliteManager fields
-
-class ApplicationVisibility <<Singleton>> {
-}
-ApplicationVisibility --> SatelliteManager
-hide ApplicationVisibility methods
-hide ApplicationVisibility fields
 
 class RStudio <<Entrypoint>> {
 }
@@ -185,17 +179,47 @@ hide ModuleTabLayoutPanel methods
 hide ModuleTabLayoutPanel fields
 TabLayoutPanel <|-- ModuleTabLayoutPanel
 
+interface WorkbenchTab {
+}
+hide WorkbenchTab methods
+hide WorkbenchTab fields
+
+abstract class DelayLoadWorkbenchTab<T> {
+}
+hide DelayLoadWorkbenchTab methods
+hide DelayLoadWorkbenchTab fields
+WorkbenchTab <|.. DelayLoadWorkbenchTab
+
+class EnvironmentTab<EnvironmentPresenter> {
+}
+hide EnvironmentTab methods
+hide EnvironmentTab fields
+DelayLoadWorkbenchTab <|-- EnvironmentTab
+
+class ViewerTab<ViewerPresenter> {
+}
+hide ViewerTab methods
+hide ViewerTab fields
+DelayLoadWorkbenchTab <|-- ViewerTab
+
+
 class WorkbenchTabPanel <<Composite: LayoutPanel>> {
 }
 hide WorkbenchTabPanel methods
 hide WorkbenchTabPanel fields
 WorkbenchTabPanel *-- ModuleTabLayoutPanel
+WorkbenchTabPanel *-- "many" WorkbenchTab
 
 class ConsoleTabPanel {
 }
 hide ConsoleTabPanel methods
 hide ConsoleTabPanel fields
 WorkbenchTabPanel <|-- ConsoleTabPanel
+
+class ArrayList<Tab> {
+}
+hide ArrayList methods
+hide ArrayList fields
 
 class PaneManager {
    - createConsole() : LogicalWindow
@@ -207,6 +231,8 @@ WorkbenchScreen *-- PaneManager
 PaneManager *-- MainSplitPanel
 PaneManager *-- "4" LogicalWindow
 PaneManager *-- ConsoleTabPanel
+PaneManager *-- "TabSet1, TabSet2" ArrayList
+PaneManager *-- WorkbenchTabPanel
 
 class DualWindowLayoutPanel {
 }
@@ -227,5 +253,25 @@ class MinimizedModuleTabLayoutPanel {
 hide MinimizedModuleTabLayoutPanel methods
 hide MinimizedModuleTabLayoutPanel fields
 MinimizedWindowFrame <|-- MinimizedModuleTabLayoutPanel
+
+class SourceShim {
+}
+hide SourceShim methods
+hide SourceShim fields
+
+class SourceWindow {
+}
+hide SourceWindow methods
+hide SourceWindow fields
+
+class Source {
+}
+hide Source methods
+hide Source fields
+
+class SourceWindowManager <<Singleton>> {
+}
+hide SourceWindowManager methods
+hide SourceWindowManager fields
 
 @enduml
