@@ -184,11 +184,66 @@ interface WorkbenchTab {
 hide WorkbenchTab methods
 hide WorkbenchTab fields
 
+class DockPanel {
+}
+hide DockPanel methods
+hide DockPanel fields
+
+abstract class DelayLoadTabShim<PresenterClass, TabClass> {
+}
+hide DelayLoadTabShim methods
+hide DelayLoadTabShim fields
+
 abstract class DelayLoadWorkbenchTab<T> {
 }
 hide DelayLoadWorkbenchTab methods
 hide DelayLoadWorkbenchTab fields
 WorkbenchTab <|.. DelayLoadWorkbenchTab
+DelayLoadWorkbenchTab --> DockPanel
+DelayLoadWorkbenchTab --> DelayLoadTabShim
+
+abstract class BasePresenter {
+}
+hide BasePresenter methods
+hide BasePresenter fields
+BasePresenter --> WorkbenchView
+
+class EnvironmentPresenter {
+}
+hide EnvironmentPresenter methods
+hide EnvironmentPresenter fields
+BasePresenter <|-- EnvironmentPresenter
+
+interface WorkbenchView {
+}
+hide WorkbenchView methods
+hide WorkbenchView fields
+
+interface EnvironmentPresenter.Display {
+}
+hide EnvironmentPresenter.Display methods
+hide EnvironmentPresenter.Display fields
+WorkbenchView <|-- EnvironmentPresenter.Display
+
+class EnvironmentPane {
+}
+hide EnvironmentPane methods
+hide EnvironmentPane fields
+
+class ToolbarPane {
+}
+hide ToolbarPane methods
+hide ToolbarPane fields
+
+abstract class WorkbenchPane {
+}
+hide WorkbenchPane methods
+hide WorkbenchPane fields
+ToolbarPane <|-- WorkbenchPane
+WorkbenchView <|.. WorkbenchPane
+WorkbenchTab <|.. WorkbenchPane
+WorkbenchPane <|-- EnvironmentPane
+EnvironmentPresenter.Display <|.. EnvironmentPane
 
 class EnvironmentTab<EnvironmentPresenter> {
 }
@@ -196,30 +251,24 @@ hide EnvironmentTab methods
 hide EnvironmentTab fields
 DelayLoadWorkbenchTab <|-- EnvironmentTab
 
-class ViewerTab<ViewerPresenter> {
+abstract class EnvironmentTab.Shim {
 }
-hide ViewerTab methods
-hide ViewerTab fields
-DelayLoadWorkbenchTab <|-- ViewerTab
-
+hide EnvironmentTab.Shim methods
+hide EnvironmentTab.Shim fields
+DelayLoadTabShim <|-- EnvironmentTab.Shim
 
 class WorkbenchTabPanel <<Composite: LayoutPanel>> {
 }
 hide WorkbenchTabPanel methods
 hide WorkbenchTabPanel fields
 WorkbenchTabPanel *-- ModuleTabLayoutPanel
-WorkbenchTabPanel *-- "many" WorkbenchTab
-
+WorkbenchTabPanel --> WorkbenchTab
+ModuleTabLayoutPanel *-- WorkbenchTab
 class ConsoleTabPanel {
 }
 hide ConsoleTabPanel methods
 hide ConsoleTabPanel fields
 WorkbenchTabPanel <|-- ConsoleTabPanel
-
-class ArrayList<Tab> {
-}
-hide ArrayList methods
-hide ArrayList fields
 
 class PaneManager {
    - createConsole() : LogicalWindow
@@ -231,8 +280,8 @@ WorkbenchScreen *-- PaneManager
 PaneManager *-- MainSplitPanel
 PaneManager *-- "4" LogicalWindow
 PaneManager *-- ConsoleTabPanel
-PaneManager *-- "TabSet1, TabSet2" ArrayList
-PaneManager *-- WorkbenchTabPanel
+PaneManager *-- "2" WorkbenchTabPanel
+PaneManager *-- SourceShim
 
 class DualWindowLayoutPanel {
 }
@@ -254,24 +303,31 @@ hide MinimizedModuleTabLayoutPanel methods
 hide MinimizedModuleTabLayoutPanel fields
 MinimizedWindowFrame <|-- MinimizedModuleTabLayoutPanel
 
-class SourceShim {
+class SourceShim <<Singleton>> {
 }
 hide SourceShim methods
 hide SourceShim fields
-
-class SourceWindow {
-}
-hide SourceWindow methods
-hide SourceWindow fields
 
 class Source {
 }
 hide Source methods
 hide Source fields
 
-class SourceWindowManager <<Singleton>> {
+interface Source.Display {
 }
-hide SourceWindowManager methods
-hide SourceWindowManager fields
+hide Source.Display methods
+hide Source.Display fields
+
+class SourcePane <<Composite>> {
+}
+hide SourcePane methods
+hide SourcePane fields
+Source.Display <|.. SourcePane
+
+class DocTabLayoutPanel {
+}
+hide DocTabLayoutPanel methods
+hide DocTabLayoutPanel fields
+TabLayoutPanel <|-- DocTabLayoutPanel
 
 @enduml

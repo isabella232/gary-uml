@@ -173,3 +173,4 @@ hide ViewerTab methods
 hide ViewerTab fields
 DelayLoadWorkbenchTab <|-- ViewerTab
 
+@enduml
