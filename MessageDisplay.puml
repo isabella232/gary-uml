@@ -1,11 +1,7 @@
 @startuml
 
-abstract class ModalDialogBase extends DialogBox {
-}
-
-class MessageDialog extends ModalDialogBase {
-}
-
+abstract class ModalDialogBase extends DialogBox
+class MessageDialog extends ModalDialogBase
 
 interface DialogBuilder {
     + addButton(): DialogBuilder
@@ -42,6 +38,10 @@ namespace Web {
 }
 
 namespace Desktop {
+    interface DesktopFrame {
+        + showMessageBox()
+    }
+
     class DesktopDialogBuilderFactory implements .DialogBuilderFactory {
         +/create(): DialogBuilder
     }
@@ -51,6 +51,10 @@ namespace Desktop {
         # /showModal()
         - createDialog(): MessageDialog
     }
+    Builder ..> DesktopFrame
+
+    class GwtCallback implements DesktopFrame
+    note bottom of GwtCallback : Implemented in native\nC++ code.
 }
 
 abstract class MessageDisplay {
@@ -62,11 +66,11 @@ abstract class MessageDisplay {
     #createDialog() : DialogBuilder
 }
 
-abstract class GlobalDisplay extends MessageDisplay {
-}
+abstract class GlobalDisplay extends MessageDisplay
 
 class DefaultGlobalDisplay extends GlobalDisplay {
    #/createDialog() : DialogBuilder
 }
 DefaultGlobalDisplay ..> DialogBuilderFactory : via GWT create
+
 @enduml
