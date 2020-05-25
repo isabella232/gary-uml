@@ -1,34 +1,72 @@
 @startuml
 
-abstract class AbstractList
-abstract AbstractCollection
-interface List
-interface Collection
-
-List <|-- AbstractList
-Collection <|-- AbstractCollection
-
-Collection <|- List
-AbstractCollection <|- AbstractList
-AbstractList <|-- ArrayList
-
-class ArrayList {
-Object[] elementData
-size()
+abstract class ModalDialogBase extends DialogBox {
 }
 
-enum TimeUnit {
-DAYS
-HOURS
-MINUTES
+class MessageDialog extends ModalDialogBase {
 }
 
-abstract class GlobalDisplay
-abstract class MessageDisplay
-class DefaultGlobalDisplay
 
-MessageDisplay <|- GlobalDisplay
-GlobalDisplay <|- DefaultGlobalDisplay
+interface DialogBuilder {
+    + addButton(): DialogBuilder
+    + setDefaultButton(): DialogBuilder
+    + showModal()
+}
 
+abstract class DialogBuilderBase implements DialogBuilder {
+    + /addButton(): DialogBuilder
+    + /setDefaultButton(): DialogBuilder
+    + showModal()
+    # type: int
+    # caption: String
+    # buttons: ArrayList<ButtonSpec>
+    # defaultButton : int
+}
 
+interface DialogBuilderFactory {
+    + create(): DialogBuilder
+}
+
+namespace Web {
+    class WebDialogBuilderFactory implements .DialogBuilderFactory {
+        +/create(): DialogBuilder
+    }
+    WebDialogBuilderFactory +-- Builder
+
+    class Builder extends .DialogBuilderBase {
+        # /showModal()
+        - createDialog(): MessageDialog
+    }
+
+    Builder ..> .MessageDialog
+}
+
+namespace Desktop {
+    class DesktopDialogBuilderFactory implements .DialogBuilderFactory {
+        +/create(): DialogBuilder
+    }
+    DesktopDialogBuilderFactory +-- Builder
+
+    class Builder extends .DialogBuilderBase {
+        # /showModal()
+        - createDialog(): MessageDialog
+    }
+}
+
+abstract class MessageDisplay {
+    +promptForText()
+    +showYesNoMessage()
+    +promptForPassword()
+    +showMessage()
+    +etc()
+    #createDialog() : DialogBuilder
+}
+
+abstract class GlobalDisplay extends MessageDisplay {
+}
+
+class DefaultGlobalDisplay extends GlobalDisplay {
+   #/createDialog() : DialogBuilder
+}
+DefaultGlobalDisplay ..> DialogBuilderFactory : via GWT create
 @enduml

@@ -1,39 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="662872dd-0089-465a-b1e6-833885ef21f2" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/MessageDisplay.puml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/uml.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="3b91e026-f39d-466d-a645-042d5a71b6c5" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tabsets.plantuml" beforeDir="false" afterPath="$PROJECT_DIR$/tabsets.plantuml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workbench.plantuml" beforeDir="false" afterPath="$PROJECT_DIR$/workbench.plantuml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MessageDisplay.puml" beforeDir="false" afterPath="$PROJECT_DIR$/MessageDisplay.puml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="UML Class" />
-      </list>
-    </option>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectId" id="1cHbX7KZWkkJke35yFbZkQWusyI" />
+  <component name="ProjectId" id="1cN1DRxERLidDeCjhFbQovUxBiL" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
-    <property name="DefaultPlantUmlFileTemplate" value="UML Class" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -43,16 +29,23 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="662872dd-0089-465a-b1e6-833885ef21f2" name="Default Changelist" comment="" />
-      <created>1590188502727</created>
+      <changelist id="3b91e026-f39d-466d-a645-042d5a71b6c5" name="Default Changelist" comment="" />
+      <created>1590354116134</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1590188502727</updated>
-      <workItem from="1590188504922" duration="577000" />
+      <updated>1590354116134</updated>
+      <workItem from="1590354118717" duration="7000" />
+      <workItem from="1590354226146" duration="5729000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="2" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="674" y="378" key="#Other_File_Types" timestamp="1590354821423">
+      <screen x="0" y="23" width="1680" height="988" />
+    </state>
+    <state x="674" y="378" key="#Other_File_Types/0.23.1680.988@0.23.1680.988" timestamp="1590354821423" />
   </component>
 </project>
