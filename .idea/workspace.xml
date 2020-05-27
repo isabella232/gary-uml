@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="3b91e026-f39d-466d-a645-042d5a71b6c5" name="Default Changelist" comment="">
+    <list default="true" id="662872dd-0089-465a-b1e6-833885ef21f2" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MessageDisplay.puml" beforeDir="false" afterPath="$PROJECT_DIR$/MessageDisplay.puml" afterDir="false" />
     </list>
@@ -28,13 +28,14 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="3b91e026-f39d-466d-a645-042d5a71b6c5" name="Default Changelist" comment="" />
+      <changelist id="662872dd-0089-465a-b1e6-833885ef21f2" name="Default Changelist" comment="" />
       <created>1590354116134</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1590354116134</updated>
       <workItem from="1590354118717" duration="7000" />
       <workItem from="1590354226146" duration="7075000" />
+      <workItem from="1590614479852" duration="256000" />
     </task>
     <task id="LOCAL-00001" summary="MessageDisplay in progress">
       <created>1590370748493</created>

@@ -1,4 +1,13 @@
 @startuml
+title MessageDisplay
+
+legend top left
+https://github.com/rstudio/gary-uml/blob/master/workbench.plantuml
+
+Major GWT classes involved in showing Message dialogs in the IDE.
+
+Last updated: 2020-05-27
+endlegend
 
 abstract class ModalDialogBase extends DialogBox
 class MessageDialog extends ModalDialogBase
