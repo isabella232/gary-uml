@@ -1,0 +1,36 @@
+@startuml
+title Console
+
+legend top left
+https://github.com/rstudio/gary-uml/blob/master/Console.puml
+
+Major GWT classes involved in IDE Console
+
+Last updated: 2020-06-02
+endlegend
+
+interface Display <<Console>> {
+    + bringToFront()
+    + focus()
+    + ensureCursorVisible()
+    + getConsoleInterruptButton(): IsWidget
+    + getConsoleClearButton(): IsWidget
+    + getProfilerInterruptButton(): IsWidget
+    + enterMode(ConsoleMode)
+    + leaveMode(ConsoleMode)
+    + mode(): ConsoleMode
+    + showProgress(LocalJobProgress)
+}
+
+class Console {
+    - view_: Display
+}
+
+class ConsolePane
+Display <|.. ConsolePane
+class Shell
+
+Shell --* ConsolePane
+Display --* Console
+
+@enduml
