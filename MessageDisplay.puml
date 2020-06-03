@@ -2,7 +2,7 @@
 title MessageDisplay
 
 legend top left
-https://github.com/rstudio/gary-uml/blob/master/workbench.plantuml
+https://github.com/rstudio/gary-uml/blob/master/MessageDisplay.puml
 
 Major GWT classes involved in showing Message dialogs in the IDE.
 

@@ -2,7 +2,7 @@
 title AceEditor
 
 legend top left
-https://github.com/rstudio/gary-uml/blob/master/AceEditor.plantuml
+https://github.com/rstudio/gary-uml/blob/master/AceEditor.puml
 
 Major GWT classes involved in Ace Editor in the IDE
 
@@ -56,4 +56,7 @@ CompletionManager --* AceEditor
 AceEditorWidget --* AceEditor
 AceEditorNative --* AceEditorWidget
 
+class RCompletionManager {
+}
+CompletionManager <|.. RCompletionManager
 @enduml
