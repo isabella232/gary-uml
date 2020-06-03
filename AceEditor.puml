@@ -1,0 +1,59 @@
+@startuml
+title AceEditor
+
+legend top left
+https://github.com/rstudio/gary-uml/blob/master/AceEditor.plantuml
+
+Major GWT classes involved in Ace Editor in the IDE
+
+Last updated: 2020-06-02
+endlegend
+
+class Renderer {
+}
+
+class LineWidgetManager {
+}
+
+class AceEditorNative {
+    +getSession()
+    +getRenderer()
+    +getLineWidgetManager()
+}
+EditSession --* AceEditorNative
+Renderer --* AceEditorNative
+LineWidgetManager --* AceEditorNative
+
+interface HasAllFocusHandlers
+interface HasClickHandlers
+interface HasText
+interface InputEditorDisplay
+
+HasAllFocusHandlers <|-- InputEditorDisplay
+HasClickHandlers <|-- InputEditorDisplay
+HasText <|-- InputEditorDisplay
+
+interface DocDisplay
+interface NavigableSourceEditor
+interface IsWidget
+
+InputEditorDisplay <|-- DocDisplay
+NavigableSourceEditor <|-- DocDisplay
+IsWidget <|-- DocDisplay
+
+interface CompletionManager
+
+class AceEditor {
+   + getEditor() : AceEditorNative
+}
+DocDisplay <|.. AceEditor
+InputEditorDisplay <|.. AceEditor
+NavigableSourceEditor <|.. AceEditor
+
+class AceEditorWidget
+
+CompletionManager --* AceEditor
+AceEditorWidget --* AceEditor
+AceEditorNative --* AceEditorWidget
+
+@enduml
