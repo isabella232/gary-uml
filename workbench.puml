@@ -1,6 +1,13 @@
 @startuml
 
 title __WORKBENCH Class Diagram__\n
+legend top left
+https://github.com/rstudio/gary-uml/blob/master/workbench.puml
+
+Major GWT classes involved in IDE Workbench panes
+
+Last updated: 2020-06-04
+endlegend
 
 abstract class MessageDisplay {
    # createDialog() {abstract}

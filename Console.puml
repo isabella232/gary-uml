@@ -6,10 +6,10 @@ https://github.com/rstudio/gary-uml/blob/master/Console.puml
 
 Major GWT classes involved in IDE Console
 
-Last updated: 2020-06-02
+Last updated: 2020-06-04
 endlegend
 
-interface Display <<Console>> {
+interface Console_Display {
     + bringToFront()
     + focus()
     + ensureCursorVisible()
@@ -22,15 +22,124 @@ interface Display <<Console>> {
     + showProgress(LocalJobProgress)
 }
 
-class Console {
-    - view_: Display
+interface ShellOutputWriter {
+    + consoleWriteError()
+    + consoleWriteExtendedError()
+    + consoleWriteOutput()
+    + consoleWritePrompt()
 }
 
-class ConsolePane
-Display <|.. ConsolePane
-class Shell
+interface InputEditorDisplay {
+   + hasSelection(): boolean
+   + getSelection(): InputEditorSelection
+   + setSelection(InputEditorSelection)
+   + getSelectionValue(): String
+   + getCursorBounds()
+   + getPositionBounds(InputEditorPosition)
+   + getBounds()
+   + setFocus()
+   + isFocused()
+   + replaceSelection()
+   + isSelectionCollapsed()
+   + clear()
+   + insertCode()
+   + collapseSelection()
+   + getStart(): InputEditorSelection
+   + getEnd(): InputEditorSelection
+   + getCurrentLineNum()
+   + getCurrentLineCount()
+   + isCursorAtEnd()
+   + getCursorPosition()
+   + setCursorPosition()
+   + getLanguageMode()
+   + goToLineStart()
+   + goToLineEnd()
+   + addPasteHandler()
+}
+
+class VirtualConsole {
+}
+
+class ConsoleOutputWriter {
+   - output_: PreWidget
+   - virtualConsole_: VirtualConsole
+}
+VirtualConsole --* ConsoleOutputWriter
+
+interface ShellDisplay {
+   + consoleWriteInput()
+   + consolePrompt()
+   + ensureInputVisible()
+   + getInputEditorDisplay(): InputEditorDisplay
+   + getConsoleOutputWriter(): ConsoleOutputWriter
+   + clearOutput()
+   + processCommandEntry(): String
+   + getCharacterWidth(): int
+   + isPromptEmpty(): boolean
+   + getPromptText(): string
+   + setReadOnly()
+   + setSuppressPendingInput()
+   + playbackActions(List<ConsoleAction>)
+   + getMaxOutputLines(): int
+   + setMaxOutputLines()
+   + setTextInputAriaLabel()
+   + addCapturingKeyDownHandler()
+   + addCapturingKeyUpHandler()
+   + getShellWidget(): Widget
+   + enableLiveReporting()
+   + clearLiveRegion()
+}
+
+ShellOutputWriter <|-- ShellDisplay
+
+class Console {
+    - view_: Console_Display
+}
+
+class ConsolePane << WorkbenchPane >> {
+    - shell_ : Shell
+}
+
+Console_Display <|.. ConsolePane
+
+class Shell {
+    - view_: Shell_Display
+    + getDisplay(): Shell_Display
+}
+
+interface Shell_Display {
+    + onBeforeUnselected()
+    + onBeforeSelected()
+    + onSelected()
+}
 
 Shell --* ConsolePane
-Display --* Console
+Console_Display --* Console
+
+class ShellWidget << Composite >> {
+    # input_: AceEditor
+    - output_: ConsoleOutputWriter
+    - pendingInput_: PreWidget
+    + /getInputEditorDisplay(): InputEditorDisplay
+}
+
+ShellDisplay <|.. ShellWidget
+
+class ShellPane {
+    # / input_: AceEditor
+    + /getInputEditorDisplay(): InputEditorDisplay
+}
+
+ShellWidget <|-- ShellPane
+Shell_Display <|.. ShellPane
+ShellDisplay <|-- Shell_Display
+Shell_Display --* Shell
+class AceEditor
+InputEditorDisplay <|.. AceEditor
+
+AceEditor --* ShellWidget
+ConsoleOutputWriter --* ShellWidget
+Console <.. ConsolePane : creates
+
 
 @enduml

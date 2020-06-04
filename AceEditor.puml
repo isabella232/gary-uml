@@ -6,7 +6,7 @@ https://github.com/rstudio/gary-uml/blob/master/AceEditor.puml
 
 Major GWT classes involved in Ace Editor in the IDE
 
-Last updated: 2020-06-02
+Last updated: 2020-06-04
 endlegend
 
 class Renderer {
