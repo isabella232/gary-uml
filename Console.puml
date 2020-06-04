@@ -1,7 +1,7 @@
 @startuml
 title Console
 
-legend top left
+legend top
 https://github.com/rstudio/gary-uml/blob/master/Console.puml
 
 Major GWT classes involved in IDE Console
@@ -104,6 +104,9 @@ Console_Display <|.. ConsolePane
 
 class Shell {
     - view_: Shell_Display
+    - historyCompletion_: HistoryCompletionManager
+    - keyDownPreviewHandlers_[];
+    - keyPressPreviewHandlers_[];
     + getDisplay(): Shell_Display
 }
 
@@ -137,9 +140,92 @@ Shell_Display --* Shell
 class AceEditor
 InputEditorDisplay <|.. AceEditor
 
+class ConsoleProgressWidget
+ShellWidget <|-- ConsoleProgressWidget
+ShellDisplay <|.. ConsoleProgressWidget
+
 AceEditor --* ShellWidget
 ConsoleOutputWriter --* ShellWidget
 Console <.. ConsolePane : creates
 
+' Completion features
+'''''''''''''''''''''''''''''''''''
+
+class CompletionRequester
+
+interface KeyDownPreviewHandler
+interface KeyPressPreviewHandler
+
+interface CompletionManager {
+   + goToHelp()
+   + goToDefinition()
+   + codeCompletion()
+   + close()
+   + onPaste()
+   + detach()
+}
+
+KeyDownPreviewHandler <|.. CompletionManager
+KeyPressPreviewHandler <|.. CompletionManager
+
+class RCompletionManager {
+    - requester_: CompletionRequester
+    - popup_: CompletionPopupDisplay
+}
+CompletionManager <|.. RCompletionManager
+
+CompletionRequester --* RCompletionManager
+
+interface CompletionPopupDisplay {
+    + clearCompletions()
+    + showCompletionValues()
+    + showErrorMessage()
+    + hide()
+    + isShowing()
+    + setPopupPosition()
+    + placeOffscreen()
+    + isOffscreen()
+    + getPopupLeft()
+    + getPopupTop()
+    + getOffsetHeight()
+    + getSelectedValue()
+    + getLastSelectedValue()
+    + getSelectionRect()
+    + selectPrev()
+    + selectNext()
+    + selectPrevPage()
+    + selectNextPage()
+    + selectFirst()
+    + selectLast()
+    + setHelpVisible()
+    + displayHelp()
+    + displayParameterHelp()
+    + displayPackageHelp()
+    + displayDataHelp()
+    + displaySnippetHelp()
+    + clearHelp()
+    + isHelpVisible()
+    + hasCompletions()
+    + numAvailableCompletions()
+    + getItems(): QualifiedName[]
+}
+
+class CompletionPopupPanel
+
+CompletionPopupDisplay <|.. CompletionPopupPanel
+
+Shell ..> RCompletionManager: creates
+Shell ..> KeyPressPreviewHandler
+Shell ..> KeyDownPreviewHandler
+Shell *-- HistoryCompletionManager
+
+CompletionPopupDisplay --* RCompletionManager
+
+class HistoryCompletionManager
+KeyDownPreviewHandler <|.. HistoryCompletionManager
+KeyPressPreviewHandler <|.. HistoryCompletionManager
+
+class CompletionListPopupPanel<HistoryMatch>
+HistoryCompletionManager *-- CompletionListPopupPanel
 
 @enduml

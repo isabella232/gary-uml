@@ -5,4 +5,6 @@ These are for my use during ongoing development; no guarantees they are accurate
 
 Sometimes even I don't understand them...
 
-Documentation: http://plantuml.com
+Documentation:
+- https://plantuml.com
+- https://crashedmind.github.io/PlantUMLHitchhikersGuide/index.html
